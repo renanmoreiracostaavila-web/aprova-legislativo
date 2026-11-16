@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d5bd6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Aprova">
+<meta name="format-detection" content="telephone=no">
+<title>Aprova Legislativo</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Plano: azul institucional sobre branco; cabeçalho fixo com abas, conteúdo em grade de cartões de largura fixa (máx. 1120px). */
+  --bg:#f4f7fc; --surface:#ffffff; --ink:#0e1b33; --muted:#5a6a86; --line:#dde6f3;
+  --accent:#1d5bd6; --accent-soft:#e7effd; --accent-ink:#ffffff; --accent-deep:#123f9a;
+  --good:#137a46; --good-soft:#e3f4ea; --bad:#bf3328; --bad-soft:#fbe9e7; --warn:#a96400;
+  --font-display:"Sora", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius:14px; --shadow:0 1px 2px rgba(14,27,51,.05), 0 6px 20px rgba(29,91,214,.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1222; --surface:#111b30; --ink:#e7edf9; --muted:#9bacc9; --line:#21304c;
+    --accent:#5d8ff2; --accent-soft:#18284a; --accent-ink:#06122b; --accent-deep:#9dbcff;
+    --good:#4cc38a; --good-soft:#123326; --bad:#ff8a80; --bad-soft:#3a1a1a; --warn:#f0b35a;
+    --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1222; --surface:#111b30; --ink:#e7edf9; --muted:#9bacc9; --line:#21304c;
+  --accent:#5d8ff2; --accent-soft:#18284a; --accent-ink:#06122b; --accent-deep:#9dbcff;
+  --good:#4cc38a; --good-soft:#123326; --bad:#ff8a80; --bad-soft:#3a1a1a; --warn:#f0b35a;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,a,.alt,.fc{touch-action:manipulation}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.25rem}
+h3{font-size:1.02rem}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* Cabeçalho */
+.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.top-in{max-width:1120px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left));display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:grid;place-items:center;flex:none}
+.brand h1{font-size:1.05rem}
+.brand p{margin:0;font-size:.8rem;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep);font-size:.8rem;font-weight:600;white-space:nowrap}
+.chip.neutral{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+nav.tabs{max-width:1120px;margin:0 auto;padding:0 16px;display:flex;gap:4px}
+nav.tabs a{padding:10px 14px;text-decoration:none;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;display:flex;align-items:center;gap:8px}
+nav.tabs a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs svg{width:18px;height:18px}
+
+main{max-width:1120px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.view{display:none}
+.view.on{display:block}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.view-head p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g2{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.g2e{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.kpi .lbl{font-size:.82rem;color:var(--muted);font-weight:600}
+.kpi .val{font-family:var(--font-display);font-size:1.9rem;font-weight:700;margin-top:4px}
+.kpi .sub{font-size:.82rem;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--accent-soft);overflow:hidden;margin-top:10px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px}
+
+/* Controles */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:.92rem;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:6px 11px;font-size:.84rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:.8rem;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select,textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);min-width:0;width:100%}
+textarea{resize:vertical;min-height:84px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+
+/* Gráfico semanal */
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font-family:var(--font-body);fill:var(--muted);font-size:12px}
+.legend{display:flex;gap:14px;font-size:.8rem;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;background:var(--accent)}
+.sw.line{height:0;border-top:2px dashed var(--muted);border-radius:0;background:none}
+
+.hbars{display:flex;flex-direction:column;gap:10px}
+.hbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:.88rem}
+.hbar .track{grid-column:1/-1;height:8px;border-radius:99px;background:var(--accent-soft);overflow:hidden}
+.hbar .track i{display:block;height:100%;background:var(--accent)}
+
+/* Pomodoro */
+.pomo-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.fase{padding:5px 11px;border-radius:999px;font-size:.8rem;font-weight:600;border:1px solid var(--line);color:var(--muted);background:transparent}
+.fase.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fase.on.pausa{background:var(--good);border-color:var(--good);color:#fff}
+.pomo-body{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:center}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{width:150px;height:150px;transform:rotate(-90deg)}
+.ring .tempo{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-size:2rem;font-weight:700}
+.ring .tempo small{display:block;font-family:var(--font-body);font-size:.72rem;font-weight:600;color:var(--muted);text-align:center;margin-top:-18px}
+.dots{display:flex;gap:6px;margin:6px 0 10px}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);display:block}
+.dots i.feito{background:var(--accent)}
+details.cfg{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+details.cfg summary{cursor:pointer;font-weight:600;font-size:.88rem;color:var(--accent)}
+.cfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.chk{display:flex;gap:8px;align-items:center;font-size:.88rem}
+@media (max-width:520px){.pomo-body{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}.pomo-body .row{justify-content:center}.dots{justify-content:center}}
+/* Cronômetro */
+.timer{font-family:var(--font-display);font-size:2.6rem;font-weight:700;letter-spacing:.02em;margin:6px 0 12px}
+.timer.run{color:var(--accent)}
+
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:.9rem}
+.list li:first-child{border-top:0}
+.list .grow{flex:1;min-width:0}
+.tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep);white-space:nowrap}
+.tag.esp{background:var(--accent);color:var(--accent-ink)}
+.tag.good{background:var(--good-soft);color:var(--good)}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:.9rem;text-align:center}
+
+/* Edital */
+.drop{border:2px dashed var(--line);border-radius:var(--radius);padding:28px 18px;text-align:center;background:var(--surface);transition:border-color .15s, background .15s;cursor:pointer}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop svg{width:40px;height:40px;color:var(--accent)}
+.area-block{margin-top:14px}
+.area-block>h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;display:flex;gap:8px;align-items:center}
+details.mat{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;background:var(--surface)}
+details.mat summary{cursor:pointer;font-weight:600;display:flex;gap:10px;align-items:center;list-style:none}
+details.mat summary::-webkit-details-marker{display:none}
+details.mat summary .cnt{margin-left:auto}
+details.mat ol{margin:10px 0 2px;padding-left:22px;font-size:.9rem;color:var(--muted)}
+details.mat ol li{margin:3px 0}
+.extract-row{display:grid;grid-template-columns:auto minmax(0,1fr) 140px auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.extract-row:first-child{border-top:0}
+.progress{font-size:.9rem;color:var(--muted);margin-top:10px}
+.notice{padding:10px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent-deep);font-size:.88rem}
+.notice.err{background:var(--bad-soft);color:var(--bad)}
+
+/* Flashcards */
+.fc-wrap{perspective:1200px;margin:6px 0 14px}
+.fc{position:relative;width:100%;min-height:260px;cursor:pointer;transform-style:preserve-3d;transition:transform .45s ease;border:0;background:none;padding:0;text-align:left}
+.fc.flip{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:10px;overflow:auto}
+.fc-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:transparent}
+.fc-face .q{font-family:var(--font-display);font-size:1.15rem;font-weight:600;line-height:1.35}
+.fc-face .a{font-size:1rem;white-space:pre-wrap}
+.fc-face .hint{margin-top:auto;font-size:.8rem;color:var(--muted)}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rate .btn{flex-direction:column;gap:0;padding:10px}
+.rate .btn small{font-weight:500;color:var(--muted);font-size:.74rem}
+.boxes{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.boxes div{border-radius:10px;background:var(--accent-soft);padding:8px 4px;text-align:center}
+.boxes b{display:block;font-family:var(--font-display);font-size:1.1rem}
+.boxes span{font-size:.72rem;color:var(--muted)}
+
+/* Discursiva */
+.crit{width:100%;border-collapse:collapse;font-size:.9rem}
+.crit th,.crit td{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+.crit th{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-top:0}
+.crit td.n{font-family:var(--font-display);font-weight:700;color:var(--accent);white-space:nowrap}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.zero li::marker{color:var(--bad)}
+.struct{display:grid;gap:6px}
+.struct div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;padding:8px 10px;border-radius:10px;background:var(--accent-soft);font-size:.9rem}
+.struct b{color:var(--accent-deep)}
+.temas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.tema{display:flex;flex-direction:column;gap:8px}
+.tema ul{margin:0;padding-left:18px;font-size:.88rem}
+.tema .links{display:flex;flex-direction:column;gap:3px;font-size:.85rem}
+.essay{min-height:340px;line-height:1.7;font-size:1rem}
+.meter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:.85rem;margin:8px 0}
+.tag.warn{background:#fff3dd;color:var(--warn)}
+.res-nota{display:flex;gap:22px;flex-wrap:wrap;align-items:baseline}
+.res-nota div{display:flex;flex-direction:column}
+.res-nota b{font-family:var(--font-display);font-size:2rem}
+.two-col{columns:2 280px;column-gap:24px}
+
+/* Quiz */
+.q-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-bottom:10px}
+.q-text{font-size:1.04rem;max-width:72ch;white-space:pre-wrap}
+.alts{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.alt{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;transition:border-color .15s, background .15s}
+.alt:hover{border-color:var(--accent)}
+.alt .l{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;background:var(--accent-soft);color:var(--accent-deep)}
+.alt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.alt.sel .l{background:var(--accent);color:var(--accent-ink)}
+.alt.ok{border-color:var(--good);background:var(--good-soft)}
+.alt.ok .l{background:var(--good);color:#fff}
+.alt.no{border-color:var(--bad);background:var(--bad-soft)}
+.alt.no .l{background:var(--bad);color:#fff}
+.alt[disabled]{cursor:default}
+.gab{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:6px}
+.gab h3{margin-bottom:6px}
+.gab p{margin:6px 0}
+.gab ul{margin:8px 0 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.gab li{font-size:.92rem}
+.gab li b{display:inline-block;min-width:26px}
+.score{font-family:var(--font-display);font-size:3rem;font-weight:700}
+.pill-ok{color:var(--good);font-weight:700}
+.pill-bad{color:var(--bad);font-weight:700}
+.qprog{height:6px;border-radius:99px;background:var(--accent-soft);overflow:hidden;margin-bottom:16px}
+.qprog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+.dialog-back{position:fixed;inset:0;background:rgba(10,18,34,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.dialog-back.on{display:flex}
+.dialog{background:var(--surface);border-radius:var(--radius);max-width:460px;width:100%;padding:20px;border:1px solid var(--line)}
+.dialog p{margin:8px 0 16px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:60;max-width:calc(100% - 32px)}
+.toast.on{opacity:1}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp .8s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.fc{transition:none}.spin{animation:none}*{scroll-behavior:auto}}
+
+@media (max-width: 900px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g2,.g2e{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width: 640px){
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);justify-content:space-around;z-index:30}
+  input[type=text],input[type=number],input[type=date],select,textarea{font-size:16px}
+  nav.tabs a{flex-direction:column;gap:2px;font-size:.72rem;padding:8px 6px;border-bottom:0;border-top:3px solid transparent;flex:1;text-align:center}
+  nav.tabs a[aria-current="page"]{border-top-color:var(--accent)}
+  .top-in .chips{width:100%}
+  .kpi .val{font-size:1.55rem}
+  .extract-row{grid-template-columns:auto minmax(0,1fr)}
+  .extract-row select,.extract-row .btn{grid-column:2}
+  .timer{font-size:2.2rem}
+}
+@media (max-width: 400px){ .g4{grid-template-columns:minmax(0,1fr)} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg>
+      </div>
+      <div>
+        <h1>Aprova Legislativo</h1>
+        <p id="plan-sub">Técnico Legislativo · Câmara Municipal de Cuiabá · Selecon</p>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip num" id="chip-prova"><span class="dot"></span>Prova em – dias</span>
+      <span class="chip neutral" id="chip-save">Carregando…</span>
+    </div>
+  </div>
+  <nav class="tabs" aria-label="Seções">
+    <a href="#inicio" data-v="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Início</a>
+    <a href="#edital" data-v="edital"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Edital</a>
+    <a href="#flashcards" data-v="flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Flashcards</a>
+    <a href="#discursiva" data-v="discursiva"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Discursiva</a>
+    <a href="#quiz" data-v="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5h.01"/></svg>Quiz</a>
+  </nav>
+</header>
+
+<main>
+<!-- INÍCIO -->
+<section class="view" id="v-inicio" aria-labelledby="h-inicio">
+  <div class="view-head">
+    <div>
+      <h2 id="h-inicio">Sua semana de estudos</h2>
+      <p id="semana-label" class="num">Semana atual</p>
+    </div>
+    <div class="row">
+      <div class="field" style="width:150px">
+        <label for="meta">Meta semanal (horas)</label>
+        <input type="number" id="meta" min="1" max="80" step="1" class="num">
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g4" id="kpis"></div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card chart">
+      <div class="card-h"><h3>Horas estudadas por dia</h3><span class="muted small num" id="chart-total"></span></div>
+      <div id="chart"></div>
+      <div class="legend"><span><i class="sw"></i>Horas estudadas</span><span><i class="sw line"></i>Ritmo diário da meta</span></div>
+    </div>
+    <div class="card" id="pomo">
+      <div class="card-h"><h3>Pomodoro</h3><span class="tag num" id="pomo-hoje">0 hoje</span></div>
+      <div class="pomo-top" role="group" aria-label="Etapa">
+        <button class="fase" data-fase="foco">Foco</button>
+        <button class="fase" data-fase="curta">Pausa curta</button>
+        <button class="fase" data-fase="longa">Pausa longa</button>
+      </div>
+      <div class="pomo-body">
+        <div class="ring" aria-live="polite">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--accent-soft)" stroke-width="9"/><circle id="pomo-arc" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg>
+          <div class="tempo num"><span><span id="pomo-t">25:00</span><small id="pomo-f">Foco</small></span></div>
+        </div>
+        <div style="min-width:0;width:100%">
+          <div class="field"><label for="timer-mat">Matéria do foco</label><select id="timer-mat"></select></div>
+          <div class="dots" id="pomo-dots" aria-label="Ciclo de pomodoros"></div>
+          <div class="row">
+            <button class="btn primary" id="p-go">Iniciar foco</button>
+            <button class="btn" id="p-skip">Pular etapa</button>
+            <button class="btn ghost sm" id="p-parcial" title="Salva o tempo de foco já cumprido e reinicia">Salvar parcial</button>
+          </div>
+        </div>
+      </div>
+      <details class="cfg">
+        <summary>Configurar tempos</summary>
+        <div class="cfg-grid">
+          <div class="field"><label for="c-foco">Foco (min)</label><input type="number" id="c-foco" min="5" max="90" class="num"></div>
+          <div class="field"><label for="c-curta">Pausa curta (min)</label><input type="number" id="c-curta" min="1" max="30" class="num"></div>
+          <div class="field"><label for="c-longa">Pausa longa (min)</label><input type="number" id="c-longa" min="5" max="60" class="num"></div>
+          <div class="field"><label for="c-ciclos">Focos até a pausa longa</label><input type="number" id="c-ciclos" min="2" max="8" class="num"></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label class="chk"><input type="checkbox" id="c-auto"> Iniciar a próxima etapa sozinho</label>
+          <label class="chk"><input type="checkbox" id="c-som"> Aviso sonoro</label>
+        </div>
+      </details>
+      <p class="muted small" style="margin:12px 0 0">Cada foco completo vira uma sessão no gráfico. Padrão do método: 25 min de foco, 5 de pausa e uma pausa de 15 min a cada 4 focos. Durante a pausa, levante e descanse a vista, sem tela.</p>
+    </div>
+  </div>
+
+  <div class="grid g2e" style="margin-top:16px">
+    <div class="card">
+      <div class="card-h"><h3>Tempo por matéria nesta semana</h3><span class="muted small">Específicos valem 1,75 por questão</span></div>
+      <div class="hbars" id="por-materia"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Registrar estudo</h3></div>
+      <form id="f-manual" class="form-grid">
+        <div class="field" style="grid-column:1/-1"><label for="m-mat">Matéria</label><select id="m-mat"></select></div>
+        <div class="field"><label for="m-min">Minutos</label><input type="number" id="m-min" min="1" max="720" value="50" class="num"></div>
+        <div class="field"><label for="m-data">Data</label><input type="date" id="m-data"></div>
+        <button class="btn primary" type="submit">Adicionar</button>
+      </form>
+      <h3 style="margin:18px 0 6px">Últimas sessões</h3>
+      <ul class="list" id="sessoes"></ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-h"><h3>Backup do progresso</h3><span class="muted small">Para levar seus dados ao app do iPhone ou a outro aparelho</span></div>
+    <div class="row">
+      <button class="btn" id="bk-copiar">Copiar backup</button>
+      <button class="btn" id="bk-baixar" hidden>Baixar arquivo de backup</button>
+      <button class="btn" id="bk-abrir">Restaurar backup</button>
+    </div>
+    <div id="bk-rest" hidden style="margin-top:12px">
+      <div class="field"><label for="bk-txt">Cole aqui o backup copiado</label><textarea id="bk-txt" placeholder='{"versao":1,...}'></textarea></div>
+      <div class="row" style="margin-top:8px">
+        <label class="btn sm" for="bk-file">Escolher arquivo .json</label><input type="file" id="bk-file" accept=".json,application/json" hidden>
+        <button class="btn primary sm" id="bk-ok">Restaurar agora</button>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">Restaurar substitui sessões, cards, questões geradas, textos e configurações deste aparelho pelos do backup.</p>
+    </div>
+  </div>
+</section>
+
+<!-- EDITAL -->
+<section class="view" id="v-edital" aria-labelledby="h-edital">
+  <div class="view-head">
+    <div>
+      <h2 id="h-edital">Edital e matérias</h2>
+      <p>Importe o PDF do edital para extrair as matérias do seu cargo. As matérias viram o seu plano: aparecem no cronômetro, nos flashcards e no quiz.</p>
+    </div>
+  </div>
+  <div class="grid g2e">
+    <div class="card">
+      <div class="card-h"><h3>Importar edital em PDF</h3></div>
+      <div class="field" style="margin-bottom:12px">
+        <label for="cargo">Cargo a procurar no edital</label>
+        <input type="text" id="cargo" value="Técnico Legislativo">
+      </div>
+      <label class="drop" id="drop" for="pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 18v-6M9 15l3-3 3 3"/></svg>
+        <div style="font-weight:600;margin-top:6px">Arraste o PDF aqui ou clique para escolher</div>
+        <div class="muted small">O arquivo é lido no seu navegador</div>
+      </label>
+      <input type="file" id="pdf" accept="application/pdf,.pdf" hidden>
+      <div class="progress" id="pdf-status" aria-live="polite"></div>
+      <div id="extract-box" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-h">
+        <h3>Seu plano atual</h3>
+        <button class="btn ghost sm" id="restaurar">Restaurar edital CMC 2026</button>
+      </div>
+      <p class="muted small" id="plano-fonte" style="margin:0 0 6px"></p>
+      <div id="plano"></div>
+      <div class="notice" style="margin-top:14px" id="estrutura">
+        <b>Prova objetiva (Selecon):</b> 70 questões com 4 alternativas. Básicos: 15 × 1,00. Gerais: 15 × 1,00. Específicos: 40 × 1,75. Para não ser eliminado: mínimo de 40 pontos e nenhuma área zerada. A discursiva tem 20 a 30 linhas sobre o conteúdo específico.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLASHCARDS -->
+<section class="view" id="v-flashcards" aria-labelledby="h-fc">
+  <div class="view-head">
+    <div>
+      <h2 id="h-fc">Flashcards</h2>
+      <p>Revisão espaçada em 5 caixas. Errou, o card volta hoje. Acertou fácil, ele sobe de caixa e reaparece em 1, 3, 7 ou 15 dias.</p>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="row" style="margin-bottom:10px">
+        <div class="field" style="flex:1;min-width:180px"><label for="fc-mat">Matéria</label><select id="fc-mat"></select></div>
+        <div class="field" style="width:170px"><label for="fc-modo">Mostrar</label>
+          <select id="fc-modo"><option value="due">Para revisar hoje</option><option value="all">Todos os cards</option></select></div>
+      </div>
+      <div id="fc-area"></div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <div class="card-h"><h3>Gerar flashcards automaticamente</h3><span class="tag" id="fc-ia-tag">Claude</span></div>
+        <div class="field"><label for="g-mat">Matéria</label><select id="g-mat"></select></div>
+        <div class="field" style="margin-top:8px"><label for="g-top">Tópico do edital</label><select id="g-top"></select></div>
+        <div class="row" style="margin-top:10px">
+          <div class="field" style="width:110px"><label for="g-n">Quantidade</label>
+            <select id="g-n"><option>5</option><option selected>8</option><option>12</option></select></div>
+          <button class="btn primary" id="g-go" style="margin-top:20px">Gerar com Claude</button>
+        </div>
+        <p class="muted small" id="g-status" aria-live="polite" style="margin:10px 0 0"></p>
+        <button class="btn ghost sm" id="g-edital" style="margin-top:6px">Criar cards de revisão do edital (sem IA)</button>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>Suas caixas</h3><span class="muted small num" id="fc-total"></span></div>
+        <div class="boxes" id="boxes"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px">Criar card manual</h3>
+        <form id="f-card" class="grid" style="gap:8px">
+          <div class="field"><label for="c-mat">Matéria</label><select id="c-mat"></select></div>
+          <div class="field"><label for="c-f">Frente (pergunta)</label><input type="text" id="c-f" required></div>
+          <div class="field"><label for="c-v">Verso (resposta)</label><textarea id="c-v" required></textarea></div>
+          <button class="btn" type="submit">Salvar card</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCURSIVA -->
+<section class="view" id="v-discursiva" aria-labelledby="h-disc">
+  <div class="view-head">
+    <div>
+      <h2 id="h-disc">Prova discursiva</h2>
+      <p>Para o Técnico Legislativo a discursiva vale 100 pontos e tem tema de conhecimento específico do cargo. Ela é aplicada no mesmo dia da objetiva. Abaixo estão as regras do edital, o método para escrever, os temas prováveis com leituras e um espaço de treino com correção.</p>
+    </div>
+  </div>
+  <div class="grid g2e">
+    <div class="card">
+      <div class="card-h"><h3>Como a Selecon corrige</h3><span class="muted small">Edital 001/2026, item 9.2</span></div>
+      <table class="crit">
+        <thead><tr><th>Critério</th><th>Pontos</th><th>O que avalia</th></tr></thead>
+        <tbody>
+          <tr><td><b>Conteúdo</b></td><td class="n num">80</td><td>Ideias fundamentais da resposta, fidelidade ao tema, consistência, relevância da fundamentação e progressão temática.</td></tr>
+          <tr><td><b>Correção formal</b></td><td class="n num">20</td><td>Ortografia, acentuação, propriedade vocabular, morfossintaxe, pontuação e elementos de coesão.</td></tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin:10px 0 0">Para não ser eliminado você precisa de <b>40 pontos</b>. O texto deve ter <b>de 20 a 30 linhas</b>. A discursiva só é corrigida para quem passou na objetiva e ficou até a <b>220ª posição</b> (20 vezes as 11 vagas) e para todos os candidatos às vagas reservadas que passaram na objetiva.</p>
+      <h3 style="margin:16px 0 8px">O que zera a prova</h3>
+      <ul class="steps zero">
+        <li>Texto em branco, fuga ao tema ou desrespeito à tipologia pedida.</li>
+        <li>Menos de 20 linhas.</li>
+        <li>Letra ilegível, desenho, verso, código ou idioma que não seja o português.</li>
+        <li>Caneta que não seja azul ou preta, de corpo transparente.</li>
+        <li>Cópia ou plágio, mesmo que parcial.</li>
+        <li>Qualquer marca que identifique você (nome, assinatura fora do campo, sinais): a prova é anulada e você é eliminado.</li>
+      </ul>
+      <p class="muted small" style="margin:10px 0 0">A nota também é reduzida quando a abordagem é tangencial, parcial ou cheia de divagações. Texto escrito fora do espaço próprio é desconsiderado, e o rascunho não vale nota.</p>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Método para a discursiva da Selecon</h3></div>
+      <ol class="steps">
+        <li><b>Destrinche o comando.</b> Sublinhe o verbo (explique, discorra, analise, identifique) e cada aspecto pedido. Cada aspecto vira um parágrafo.</li>
+        <li><b>Planeje em 4 linhas:</b> a ideia central, o aspecto 1, o aspecto 2 e o fechamento. Esse plano garante a progressão temática, que entra nos 80 pontos de conteúdo.</li>
+        <li><b>Responda logo na introdução.</b> A primeira frase já deve atender ao comando, sem rodeios.</li>
+        <li><b>Fundamente.</b> Use conceitos e dispositivos do conteúdo específico: Lei Orgânica, Regimento Interno, CF, LC 95/1998, Manual de Redação. Cite número de artigo só se tiver certeza; na dúvida, escreva "conforme a Constituição Federal".</li>
+        <li><b>Mire 25 a 28 linhas.</b> Isso dá folga contra o mínimo de 20 e o máximo de 30.</li>
+        <li><b>Passe a limpo com calma.</b> Faça letra legível, recuo de parágrafo visível e corrija erros com um traço simples, sem rabiscar.</li>
+        <li><b>Revise a forma (20 pontos):</b> acentos, crase, concordância, vírgulas e repetição de palavras.</li>
+      </ol>
+      <h3 style="margin:16px 0 8px">Estrutura modelo</h3>
+      <div class="struct">
+        <div><b>Introdução</b><span>3 a 5 linhas. Contextualize e responda ao comando.</span></div>
+        <div><b>Desenvolvimento 1</b><span>7 a 9 linhas. Primeiro aspecto, com fundamento e um exemplo do cotidiano da Câmara.</span></div>
+        <div><b>Desenvolvimento 2</b><span>7 a 9 linhas. Segundo aspecto, com a mesma lógica.</span></div>
+        <div><b>Conclusão</b><span>3 a 4 linhas. Retome a ideia central e mostre a importância para o serviço público.</span></div>
+      </div>
+      <div class="two-col small" style="margin-top:14px">
+        <p style="margin:0 0 6px"><b>Rende pontos:</b> vocabulário técnico do edital; 3ª pessoa; frases de até 3 linhas; conectivos variados (além disso, dessa forma, por conseguinte, portanto).</p>
+        <p style="margin:0"><b>Evite:</b> 1ª pessoa, gírias, abreviações, listas soltas sem frase, copiar o enunciado, título (se não for pedido), opinião político-partidária, qualquer nome ou assinatura.</p>
+      </div>
+      <div class="notice" style="margin-top:14px"><b>Tempo sugerido (4h30 para tudo):</b> cerca de 3h10 para as 70 objetivas e o cartão; 60 min para a discursiva (10 de plano, 25 de rascunho, 20 para passar a limpo, 5 de revisão); 20 min de folga.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-h"><h3>Temas prováveis e o que ler</h3><span class="muted small">Propostas de treino criadas a partir do conteúdo específico do edital. Não são questões da banca.</span></div>
+    <div class="temas" id="temas"></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-h"><h3>Treinar redação</h3><span class="tag num" id="d-crono">60:00</span></div>
+      <div class="field"><label for="d-tema">Tema</label><select id="d-tema"></select></div>
+      <div class="notice" id="d-prop" style="margin:10px 0"></div>
+      <label class="small muted" for="d-texto">Seu texto (digite como escreveria na folha; os parágrafos contam como linhas novas)</label>
+      <textarea id="d-texto" class="essay" spellcheck="true"></textarea>
+      <div class="meter num"><span id="d-linhas" class="tag">0 linhas</span><span class="muted" id="d-chars">0 caracteres</span><span class="muted">Estimativa de cerca de 70 caracteres por linha manuscrita</span></div>
+      <div class="row">
+        <button class="btn" id="d-crono-go">Iniciar cronômetro de 60 min</button>
+        <button class="btn" id="d-salvar">Salvar texto</button>
+        <button class="btn primary" id="d-corrigir">Corrigir com Claude (critérios Selecon)</button>
+      </div>
+      <p class="muted small" id="d-st" aria-live="polite" style="margin:10px 0 0"></p>
+      <div id="d-res" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:8px">Meus textos</h3>
+      <ul class="list" id="d-lista"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="view" id="v-quiz" aria-labelledby="h-quiz">
+  <div class="view-head">
+    <div>
+      <h2 id="h-quiz">Quiz estilo Selecon</h2>
+      <p>Questões de múltipla escolha com 4 alternativas, como na prova. O gabarito comentado explica cada alternativa.</p>
+    </div>
+  </div>
+  <div id="quiz-root"></div>
+</section>
+</main>
+
+<div class="dialog-back" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+  <div class="dialog">
+    <h3 id="dlg-t">Confirmar</h3>
+    <p id="dlg-p"></p>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" id="dlg-no">Cancelar</button>
+      <button class="btn primary" id="dlg-yes">Confirmar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ============ Utilidades ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const z=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());
+const parseIso=s=>{const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);};
+const hoje=()=>iso(new Date());
+const addDias=(s,n)=>{const d=parseIso(s);d.setDate(d.getDate()+n);return iso(d);};
+const inicioSemana=s=>{const d=parseIso(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d);};
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+const fmtH=min=>{const h=Math.floor(min/60),m=Math.round(min%60);return h?(h+'h'+(m?z(m):'')):(m+'min');};
+const fmtDec=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:1});
+const DIAS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const LETRAS=['A','B','C','D'];
+const INTERVALOS=[0,1,3,7,15];
+const DATA_PROVA='2026-12-13';
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),2600);}
+function confirmar(titulo,texto){return new Promise(res=>{$('#dlg-t').textContent=titulo;$('#dlg-p').textContent=texto;const d=$('#dlg');d.classList.add('on');$('#dlg-yes').focus();
+  const fim=v=>{d.classList.remove('on');$('#dlg-yes').onclick=$('#dlg-no').onclick=null;res(v);};
+  $('#dlg-yes').onclick=()=>fim(true);$('#dlg-no').onclick=()=>fim(false);});}
+
+/* ============ Conteúdo padrão: edital CMC 2026 – Técnico Legislativo ============ */
+const A_BAS='Conhecimentos Básicos', A_GER='Conhecimentos Gerais', A_ESP='Conhecimentos Específicos';
+const PLANO_PADRAO={cargo:'Técnico Legislativo',orgao:'Câmara Municipal de Cuiabá',banca:'Selecon',fonte:'Edital nº 001/2026-CMC, Anexo V (conteúdo pré-carregado)',materias:[
+ {nome:'Língua Portuguesa',area:A_BAS,peso:1,topicos:['Leitura e interpretação de textos de variados gêneros discursivos','Condições de produção e marcas composicionais de gêneros textuais','Variedades linguísticas; registros formal e informal','Fonética: prosódia, ortografia','Morfologia: formação, classificação e flexão das palavras','Sintaxe: concordância, regência, colocação pronominal, conjunções, modos e tempos verbais','Semântica: polissemia, paronímia, homonímia, denotação e conotação','Textualidade: coesão, coerência, intertextualidade, argumentação','Pontuação','Discurso direto e indireto']},
+ {nome:'Raciocínio Lógico e Matemático',area:A_BAS,peso:1,topicos:['Operações com conjuntos','Raciocínio lógico numérico e sequencial','Proposições: valores lógicos, conectivos e negação','Argumentação lógica e diagramas lógicos','Equivalências e implicações lógicas','Quantificadores universal e existencial','Problemas de contagem: princípios aditivo e multiplicativo']},
+ {nome:'Noções de Informática',area:A_BAS,peso:1,topicos:['Microinformática: hardware, software, entrada, saída e armazenamento','Windows 10 e 11 e distribuições Linux','Microsoft 365 (Word, Excel, PowerPoint) e LibreOffice 7+ (Writer, Calc, Impress)','Redes, internet, TCP/IP, navegadores, e-mail e colaboração','Computação em nuvem, serviços online e redes sociais','Segurança da informação: malware, phishing, backup, firewall, 2FA','Noções da LGPD (Lei nº 13.709/2018)']},
+ {nome:'Legislação Municipal',area:A_BAS,peso:1,topicos:['Lei Orgânica do Município de Cuiabá','Regimento Interno da Câmara Municipal de Cuiabá (Resolução nº 08/2016)','LC nº 93/2003 – Estatuto dos Servidores','LC nº 235/2011 – Plano de Cargos, Carreiras e Vencimentos, com alterações da LC nº 609/2026']},
+ {nome:'História e Geografia de MT',area:A_GER,peso:1,topicos:['Período colonial: bandeirantes, ouro, fundação de Cuiabá e de Vila Bela, escravidão','Período imperial: crise da mineração, Rusga, quilombos, Guerra da Tríplice Aliança','Período republicano: coronelismo, economia, Era Vargas, questão fundiária, governadores','Atualidades de MT: política, economia, energia, desenvolvimento sustentável','Geografia: Centro-Oeste, geopolítica, ocupação do território, domínios naturais','Aspectos político-administrativos e socioeconômicos; formação étnica','Fronteira agrícola, economia no contexto nacional e urbanização']},
+ {nome:'Ética e Filosofia',area:A_GER,peso:1,topicos:['Fundamentos da Filosofia','Ética ou filosofia moral; consciência crítica','Valores éticos e cultura; juízos de fato e juízos de valor','Ética e cidadania; racionalismo ético; ética e liberdade']},
+ {nome:'Relações Interpessoais',area:A_GER,peso:1,topicos:['Relações humanas e comunicação interpessoal','Características de um bom atendimento; postura profissional','Integração, empatia, capacidade de ouvir e argumentação flexível']},
+ {nome:'Direito Administrativo e Constitucional',area:A_ESP,peso:1.75,topicos:['Estado, governo e Administração Pública: conceitos e princípios','Administração direta e indireta; órgãos e agentes públicos','Princípios, poderes e atos administrativos (requisitos, atributos e espécies)','Controle da Administração e responsabilidade civil do Estado','Direitos e garantias fundamentais; arts. 37 a 41 da Constituição Federal']},
+ {nome:'Poder Legislativo e Processo Legislativo',area:A_ESP,peso:1.75,topicos:['Organização e funcionamento do Poder Legislativo Municipal','Câmara Municipal, Mesa Diretora, Plenário e Comissões','Processo legislativo','Técnica legislativa (LC nº 95/1998)']},
+ {nome:'Redação Oficial',area:A_ESP,peso:1.75,topicos:['Comunicações oficiais e padrão ofício','Ofícios, memorandos, requerimentos e correspondências','Atas, sinopses e relatórios','Pronomes de tratamento, fechos e concordância']},
+ {nome:'Arquivologia e Atendimento',area:A_ESP,peso:1.75,topicos:['Protocolo: recebimento, registro, distribuição, tramitação e expedição','Classificação, organização, guarda, conservação e arquivamento','Atendimento ao público, recepção e relações no trabalho']},
+ {nome:'Contabilidade Pública',area:A_ESP,peso:1.75,topicos:['Receita pública e seus estágios','Despesa pública e seus estágios','Orçamento público: PPA, LDO, LOA e princípios orçamentários']},
+ {nome:'Segurança do Trabalho e Fotografia',area:A_ESP,peso:1.75,topicos:['Noções de higiene e segurança do trabalho','Noções de fotografia aplicada às atividades institucionais']}
+]};
+
+/* Banco de questões no estilo Selecon (4 alternativas, gabarito comentado) */
+const Q=(id,materia,enunciado,alts,correta,comentario,por)=>({id,materia,enunciado,alternativas:alts,correta,comentario,porAlternativa:por,origem:'base'});
+const BANCO=[
+Q('b01','Redação Oficial','Um técnico legislativo redige ofício a ser assinado pelo Diretor-Geral da Câmara e endereçado ao Presidente da Casa, autoridade hierarquicamente superior ao signatário. De acordo com o Manual de Redação da Presidência da República (3ª edição), o fecho adequado é:',
+ ['Atenciosamente,','Respeitosamente,','Cordialmente,','Sem mais para o momento, subscrevemo-nos,'],1,
+ 'O Manual prevê apenas dois fechos para comunicações oficiais: "Respeitosamente," para autoridades de hierarquia superior e "Atenciosamente," para autoridades de mesma hierarquia ou de hierarquia inferior.',
+ ['Incorreta. "Atenciosamente" serve para mesma hierarquia ou hierarquia inferior.','Correta. O destinatário é superior hierárquico do signatário.','Incorreta. "Cordialmente" não é fecho previsto no Manual.','Incorreta. Fórmulas longas e arcaicas devem ser evitadas.']),
+Q('b02','Redação Oficial','Na 3ª edição do Manual de Redação da Presidência da República, os expedientes ofício, aviso e memorando, que antes se distinguiam sobretudo pela finalidade, passaram a:',
+ ['ser substituídos integralmente pelo correio eletrônico.','seguir nomenclatura e diagramação únicas, no chamado padrão ofício.','adotar formatos distintos conforme o órgão emissor.','ser de uso exclusivo do Poder Executivo federal, vedado seu uso por Câmaras Municipais.'],1,
+ 'A 3ª edição uniformizou os três expedientes, que passaram a seguir uma nomenclatura e uma diagramação únicas: o padrão ofício.',
+ ['Incorreta. O e-mail é um meio de comunicação, mas não substituiu os expedientes.','Correta. É a principal novidade da 3ª edição para os expedientes.','Incorreta. O objetivo foi justamente padronizar.','Incorreta. O Manual é referência adotada por órgãos de todos os Poderes e esferas.']),
+Q('b03','Redação Oficial','Em requerimento dirigido ao Presidente da Câmara Municipal, a frase que observa as normas de concordância com pronome de tratamento é:',
+ ['Vossa Excelência sabeis que o prazo regimental termina amanhã.','Solicitamos que Vossa Excelência encaminhe o projeto à vossa assessoria.','Vossa Excelência está ciente de que sua presença foi solicitada na sessão.','Sua Excelência, o senhor Presidente, estais convidado para a audiência.'],2,
+ 'Embora se refiram à 2ª pessoa (a quem se fala), os pronomes de tratamento levam o verbo e os possessivos para a 3ª pessoa. Usa-se "Vossa" ao falar com a autoridade e "Sua" ao falar sobre ela.',
+ ['Incorreta. O verbo deve ir para a 3ª pessoa: "sabe".','Incorreta. O possessivo deve ser "sua assessoria".','Correta. Verbo "está" e possessivo "sua" na 3ª pessoa.','Incorreta. O verbo deve ser "está".']),
+Q('b04','Poder Legislativo e Processo Legislativo','Segundo a Lei Complementar nº 95/1998, que trata da elaboração, da redação, da alteração e da consolidação das leis, a cláusula de revogação integra a:',
+ ['parte preliminar.','parte normativa.','parte final.','ementa.'],2,
+ 'Pelo art. 3º da LC nº 95/1998, a parte preliminar reúne epígrafe, ementa, preâmbulo, objeto e âmbito de aplicação. A parte normativa traz o texto das normas de conteúdo substantivo. A parte final contém as disposições de implementação, as transitórias, a cláusula de vigência e a de revogação.',
+ ['Incorreta. A parte preliminar abre a lei (epígrafe, ementa, preâmbulo).','Incorreta. A parte normativa traz o conteúdo substantivo.','Correta. Vigência e revogação ficam na parte final.','Incorreta. A ementa resume o objeto da lei e faz parte da parte preliminar.']),
+Q('b05','Poder Legislativo e Processo Legislativo','Uma lei municipal estabelece que entrará em vigor após decorridos 30 dias de sua publicação. De acordo com a regra de contagem da LC nº 95/1998, adotada como parâmetro de técnica legislativa:',
+ ['exclui-se o dia da publicação e a lei entra em vigor no último dia do prazo.','o prazo inclui a data da publicação e o último dia, e a lei entra em vigor no dia subsequente à consumação integral do prazo.','o prazo só começa a correr no primeiro dia útil após a publicação.','a lei entra em vigor no próprio dia em que se completam 30 dias úteis.'],1,
+ 'O art. 8º, § 1º, da LC nº 95/1998 determina que a contagem do prazo de vacância inclua a data da publicação e o último dia do prazo. A lei entra em vigor no dia seguinte à consumação integral do prazo.',
+ ['Incorreta. A data da publicação é incluída na contagem.','Correta. É a redação do art. 8º, § 1º.','Incorreta. Não há regra de dia útil para a vacância.','Incorreta. O prazo é contado em dias corridos.']),
+Q('b06','Poder Legislativo e Processo Legislativo','De acordo com a LC nº 95/1998, os incisos, as alíneas e os itens de um artigo são representados, respectivamente, por:',
+ ['algarismos romanos, letras minúsculas e algarismos arábicos.','letras minúsculas, algarismos romanos e algarismos arábicos.','algarismos arábicos, algarismos romanos e letras minúsculas.','algarismos romanos, letras maiúsculas e algarismos arábicos.'],0,
+ 'Pelo art. 10 da LC nº 95/1998: incisos em algarismos romanos, alíneas em letras minúsculas e itens em algarismos arábicos. O artigo usa numeração ordinal até o nono e cardinal a partir do décimo.',
+ ['Correta. Inciso I, alínea a, item 1.','Incorreta. A ordem está trocada.','Incorreta. A ordem está trocada.','Incorreta. As alíneas usam letras minúsculas.']),
+Q('b07','Legislação Municipal','Conforme o art. 23 da Lei Orgânica do Município de Cuiabá, NÃO integra o processo legislativo municipal a elaboração de:',
+ ['resoluções.','decretos legislativos.','portarias.','leis complementares.'],2,
+ 'O art. 23 da Lei Orgânica de Cuiabá lista: emendas à Lei Orgânica, leis complementares, leis ordinárias, resoluções e decretos legislativos. Portarias são atos administrativos internos e ficam fora do processo legislativo.',
+ ['Incorreta. Resoluções integram o processo legislativo.','Incorreta. Decretos legislativos integram o processo legislativo.','Correta. Portaria é ato administrativo.','Incorreta. Leis complementares integram o processo legislativo.']),
+Q('b08','Poder Legislativo e Processo Legislativo','Nos termos do art. 29 da Constituição Federal, a Lei Orgânica do Município deve ser:',
+ ['votada em turno único e aprovada por maioria absoluta dos membros da Câmara.','votada em dois turnos, com interstício mínimo de dez dias, e aprovada por dois terços dos membros da Câmara, que a promulgará.','votada em dois turnos, com interstício de cinco dias, e aprovada por três quintos dos vereadores.','sancionada pelo Prefeito após aprovação por maioria simples.'],1,
+ 'O art. 29 da CF determina que o Município se rege por lei orgânica votada em dois turnos, com interstício mínimo de dez dias, aprovada por dois terços dos membros da Câmara Municipal, que a promulga.',
+ ['Incorreta. São dois turnos e quórum de dois terços.','Correta. É a literalidade do art. 29.','Incorreta. Interstício e quórum estão errados.','Incorreta. A Lei Orgânica é promulgada pela Câmara, sem sanção.']),
+Q('b09','Poder Legislativo e Processo Legislativo','No controle externo das contas municipais, o parecer prévio emitido pelo Tribunal de Contas sobre as contas que o Prefeito deve prestar anualmente só deixará de prevalecer por decisão de:',
+ ['maioria simples dos vereadores presentes.','maioria absoluta dos membros da Câmara Municipal.','três quintos dos membros da Câmara Municipal.','dois terços dos membros da Câmara Municipal.'],3,
+ 'O art. 31, § 2º, da CF exige dois terços dos membros da Câmara Municipal para afastar o parecer prévio do órgão competente. A fiscalização do Município cabe ao Legislativo Municipal, com auxílio do Tribunal de Contas.',
+ ['Incorreta. O quórum é qualificado.','Incorreta. Maioria absoluta é insuficiente.','Incorreta. Três quintos não é o quórum previsto.','Correta. Art. 31, § 2º, da CF.']),
+Q('b10','Poder Legislativo e Processo Legislativo','A Constituição Federal assegura aos Vereadores inviolabilidade por suas opiniões, palavras e votos:',
+ ['em todo o território nacional, em qualquer circunstância.','no exercício do mandato e na circunscrição do Município.','somente quando proferidos dentro do plenário da Câmara.','com as mesmas imunidades processuais dos Deputados Federais.'],1,
+ 'O art. 29, VIII, da CF garante a inviolabilidade dos Vereadores por opiniões, palavras e votos no exercício do mandato e na circunscrição do Município. Diferentemente dos parlamentares federais, eles não têm imunidade processual.',
+ ['Incorreta. Há limite territorial e funcional.','Correta. Literalidade do art. 29, VIII.','Incorreta. A proteção não se restringe ao plenário.','Incorreta. Vereadores não têm imunidade formal (processual).']),
+Q('b11','Direito Administrativo e Constitucional','Ao constatar risco sanitário, a Administração interdita um estabelecimento comercial sem precisar de prévia autorização judicial. Essa possibilidade de executar diretamente a própria decisão expressa o atributo do ato administrativo denominado:',
+ ['tipicidade.','autoexecutoriedade.','presunção de legitimidade.','motivação.'],1,
+ 'Autoexecutoriedade é a possibilidade de a Administração executar seus atos por meios próprios, sem recorrer ao Judiciário, quando a lei autoriza ou a urgência exige. É típica do poder de polícia.',
+ ['Incorreta. Tipicidade é a correspondência do ato a figuras previstas em lei.','Correta. Execução direta, sem ordem judicial.','Incorreta. Presunção de legitimidade é a suposição de que o ato está conforme a lei.','Incorreta. Motivação é a exposição dos motivos e não é atributo.']),
+Q('b12','Direito Administrativo e Constitucional','São requisitos (elementos) do ato administrativo, conforme a doutrina majoritária e a Lei nº 4.717/1965:',
+ ['competência, finalidade, forma, motivo e objeto.','competência, conveniência, forma, mérito e objeto.','imperatividade, finalidade, forma, motivo e objeto.','legalidade, impessoalidade, moralidade, publicidade e eficiência.'],0,
+ 'Os cinco requisitos clássicos são competência (sujeito), finalidade, forma, motivo e objeto. Competência, finalidade e forma são vinculados. Motivo e objeto formam o mérito nos atos discricionários.',
+ ['Correta. São os cinco elementos.','Incorreta. Conveniência e mérito não são requisitos autônomos.','Incorreta. Imperatividade é atributo, não requisito.','Incorreta. São os princípios do art. 37 da CF (LIMPE).']),
+Q('b13','Direito Administrativo e Constitucional','Após processo regular, o Presidente da Câmara aplica advertência a um servidor efetivo que descumpriu dever funcional. Trata-se do exercício do poder:',
+ ['regulamentar.','de polícia.','disciplinar.','normativo de urgência.'],2,
+ 'O poder disciplinar permite à Administração apurar infrações e aplicar penalidades a servidores e a quem tem vínculo especial com ela. O poder de polícia, por outro lado, alcança os particulares em geral.',
+ ['Incorreta. O poder regulamentar serve para editar atos normativos.','Incorreta. O poder de polícia limita direitos de particulares em geral.','Correta. Punição de servidor por falta funcional.','Incorreta. Não existe essa categoria clássica.']),
+Q('b14','Direito Administrativo e Constitucional','É hipótese de acumulação remunerada lícita de cargos públicos, havendo compatibilidade de horários (art. 37, XVI, da CF):',
+ ['dois cargos de técnico legislativo em Câmaras diferentes.','um cargo de professor com outro técnico ou científico.','um cargo de técnico legislativo com um de analista legislativo na mesma Câmara.','quaisquer dois cargos, desde que a soma das jornadas não ultrapasse 60 horas semanais.'],1,
+ 'A CF admite três hipóteses de acumulação, sempre com compatibilidade de horários: dois cargos de professor; um de professor com outro técnico ou científico; dois cargos ou empregos privativos de profissionais de saúde com profissão regulamentada.',
+ ['Incorreta. Não se enquadra nas exceções.','Correta. Hipótese da alínea "b" do inciso XVI.','Incorreta. Não se enquadra nas exceções.','Incorreta. A CF não traz limite de horas como critério.']),
+Q('b15','Direito Administrativo e Constitucional','Conforme o art. 41 da Constituição Federal, o servidor nomeado para cargo de provimento efetivo em virtude de concurso público adquire estabilidade:',
+ ['após dois anos de efetivo exercício.','após três anos de efetivo exercício, sendo obrigatória avaliação especial de desempenho por comissão instituída para essa finalidade.','imediatamente após a posse.','após três anos, independentemente de avaliação de desempenho.'],1,
+ 'São estáveis após três anos de efetivo exercício os servidores nomeados para cargo efetivo por concurso. O § 4º do art. 41 exige avaliação especial de desempenho por comissão como condição para a estabilidade.',
+ ['Incorreta. O prazo de dois anos vigorava antes da EC nº 19/1998.','Correta. Art. 41, caput e § 4º.','Incorreta. A posse inicia o estágio, mas não confere estabilidade.','Incorreta. A avaliação especial é obrigatória.']),
+Q('b16','Direito Administrativo e Constitucional','Um servidor da Câmara Municipal, dirigindo veículo oficial a serviço, causa dano a um particular. À luz do art. 37, § 6º, da Constituição Federal:',
+ ['a vítima precisa comprovar dolo ou culpa do servidor para ser indenizada.','o servidor responde objetivamente perante a vítima.','o Município responde objetivamente pelo dano, assegurado o direito de regresso contra o servidor nos casos de dolo ou culpa.','não há responsabilidade, por se tratar de órgão do Poder Legislativo.'],2,
+ 'As pessoas jurídicas de direito público respondem objetivamente pelos danos que seus agentes causarem a terceiros, com direito de regresso contra o agente em caso de dolo ou culpa. A Câmara é órgão sem personalidade jurídica, então a responsabilidade é do Município.',
+ ['Incorreta. A responsabilidade do Estado é objetiva.','Incorreta. O servidor responde de forma subjetiva, em ação regressiva.','Correta. Responsabilidade objetiva e regresso por dolo ou culpa.','Incorreta. Os atos do Legislativo também geram responsabilidade estatal.']),
+Q('b17','Arquivologia e Atendimento','Na teoria das três idades, os documentos que são pouco consultados pelo órgão produtor e aguardam, em depósito, a eliminação ou o recolhimento para guarda permanente compõem o arquivo:',
+ ['corrente.','intermediário.','permanente.','setorial.'],1,
+ 'Arquivo corrente: documentos em uso frequente. Intermediário: uso eventual, aguardando destinação final. Permanente: documentos de valor histórico, probatório ou informativo, guardados definitivamente.',
+ ['Incorreta. No arquivo corrente o uso é frequente.','Correta. É a fase de espera da destinação final.','Incorreta. No permanente a guarda é definitiva.','Incorreta. "Setorial" diz respeito à localização, não à idade.']),
+Q('b18','Arquivologia e Atendimento','NÃO constitui atividade típica do setor de protocolo:',
+ ['recebimento e registro de documentos.','distribuição e controle da tramitação.','expedição de correspondências.','eliminação de documentos conforme a tabela de temporalidade.'],3,
+ 'O protocolo cuida de receber, classificar, registrar, distribuir, controlar a tramitação e expedir documentos. A eliminação faz parte da avaliação documental, conduzida com base na tabela de temporalidade e com acompanhamento de comissão própria.',
+ ['Incorreta. É atividade de protocolo.','Incorreta. É atividade de protocolo.','Incorreta. É atividade de protocolo.','Correta. Eliminação é etapa da gestão e avaliação de documentos.']),
+Q('b19','Contabilidade Pública','A etapa da despesa pública que consiste na verificação do direito adquirido pelo credor, com base nos títulos e documentos comprobatórios do respectivo crédito, denomina-se:',
+ ['empenho.','liquidação.','pagamento.','fixação.'],1,
+ 'Pela Lei nº 4.320/1964, o empenho cria a obrigação de pagamento (art. 58), a liquidação verifica o direito adquirido pelo credor (art. 63) e o pagamento entrega o valor ao credor. Nenhuma despesa pode ser realizada sem prévio empenho (art. 60).',
+ ['Incorreta. O empenho reserva a dotação e cria a obrigação.','Correta. Definição do art. 63.','Incorreta. O pagamento é a etapa final.','Incorreta. A fixação acontece na fase de planejamento (LOA).']),
+Q('b20','Contabilidade Pública','O princípio orçamentário segundo o qual a lei orçamentária anual não conterá dispositivo estranho à previsão da receita e à fixação da despesa, ressalvadas a autorização para créditos suplementares e para operações de crédito, é o da:',
+ ['universalidade.','unidade.','exclusividade.','anualidade.'],2,
+ 'É o princípio da exclusividade, previsto no art. 165, § 8º, da CF. A universalidade exige que todas as receitas e despesas constem do orçamento. A unidade, que haja um só orçamento. A anualidade, que ele valha por um exercício.',
+ ['Incorreta. Universalidade trata da abrangência.','Incorreta. Unidade trata de um único orçamento.','Correta. Art. 165, § 8º, da CF.','Incorreta. Anualidade trata da vigência.']),
+Q('b21','Segurança do Trabalho e Fotografia','No mapa de riscos, cada grupo de risco é representado por uma cor. Os riscos ergonômicos são indicados pela cor:',
+ ['verde.','vermelha.','amarela.','marrom.'],2,
+ 'Convenção usual do mapa de riscos: verde para físicos, vermelho para químicos, marrom para biológicos, amarelo para ergonômicos e azul para riscos de acidentes. O tamanho do círculo indica a intensidade.',
+ ['Incorreta. Verde indica riscos físicos.','Incorreta. Vermelho indica riscos químicos.','Correta. Amarelo indica riscos ergonômicos.','Incorreta. Marrom indica riscos biológicos.']),
+Q('b22','Noções de Informática','De acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), NÃO é considerado dado pessoal sensível:',
+ ['dado referente à saúde.','convicção religiosa.','dado biométrico.','endereço residencial.'],3,
+ 'O art. 5º, II, da LGPD define como sensível o dado sobre origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização religiosa, filosófica ou política, saúde, vida sexual, dado genético ou biométrico. O endereço é dado pessoal comum.',
+ ['Incorreta. Saúde é dado sensível.','Incorreta. Religião é dado sensível.','Incorreta. Biometria é dado sensível.','Correta. Endereço é dado pessoal, mas não sensível.']),
+Q('b23','Noções de Informática','No Microsoft Excel e no LibreOffice Calc, a fórmula que soma todos os valores das células B2 até B10 é:',
+ ['=SOMA(B2:B10)','=SOMA(B2;B10)','=SOMAR(B2-B10)','=TOTAL(B2..B10)'],0,
+ 'Os dois-pontos indicam intervalo (de B2 até B10). O ponto e vírgula separa argumentos, então =SOMA(B2;B10) soma apenas as duas células.',
+ ['Correta. Intervalo contínuo.','Incorreta. Soma só B2 e B10.','Incorreta. A função não existe com essa sintaxe.','Incorreta. A sintaxe é inválida.']),
+Q('b24','Raciocínio Lógico e Matemático','A negação lógica da proposição "Todo vereador é assíduo às sessões" é:',
+ ['Nenhum vereador é assíduo às sessões.','Algum vereador não é assíduo às sessões.','Todo vereador não é assíduo às sessões.','Algum vereador é assíduo às sessões.'],1,
+ 'Para negar "Todo A é B", basta um contraexemplo: "Algum A não é B". "Nenhum" é o contrário, não a negação.',
+ ['Incorreta. É proposição contrária, não negação.','Correta. Existe pelo menos um que não é.','Incorreta. Equivale a "nenhum".','Incorreta. Não contradiz a original.']),
+Q('b25','Raciocínio Lógico e Matemático','Considere a proposição: "Se houver quórum, então a sessão será aberta." A sua negação é:',
+ ['Não há quórum e a sessão não será aberta.','Há quórum e a sessão não será aberta.','Se não houver quórum, a sessão não será aberta.','Não há quórum ou a sessão será aberta.'],1,
+ 'A negação de "Se p, então q" é "p e não q". A condicional só é falsa quando o antecedente é verdadeiro e o consequente é falso.',
+ ['Incorreta. Nega os dois termos.','Correta. Mantém p e nega q.','Incorreta. É a inversa, não a negação.','Incorreta. "~p ou q" é equivalente à proposição original.']),
+Q('b26','Língua Portuguesa','Assinale a frase em que o acento indicativo de crase está empregado corretamente:',
+ ['O requerimento foi encaminhado à Comissão de Constituição e Justiça.','A sessão começará à partir das 9h.','Entregamos o ofício à Vossa Excelência.','O vereador referiu-se à projetos antigos.'],0,
+ 'Há crase quando a preposição "a" exigida pelo termo regente se funde ao artigo feminino "a". "Encaminhar a" + "a Comissão" resulta em "à Comissão".',
+ ['Correta. Preposição + artigo feminino.','Incorreta. Não há crase antes de verbo.','Incorreta. Não há crase antes de pronome de tratamento, salvo senhora, senhorita e dona.','Incorreta. Não há crase antes de palavra masculina no plural.']),
+Q('b27','Língua Portuguesa','Está de acordo com a norma-padrão a frase:',
+ ['Fazem dois anos que a lei foi aprovada.','Houveram muitas emendas ao projeto.','Haviam vereadores ausentes na votação.','Faz dois anos que houve a última audiência pública.'],3,
+ '"Fazer" indicando tempo decorrido e "haver" no sentido de existir ou ocorrer são impessoais e ficam na 3ª pessoa do singular.',
+ ['Incorreta. O certo é "Faz dois anos".','Incorreta. O certo é "Houve muitas emendas".','Incorreta. O certo é "Havia vereadores".','Correta. Os dois verbos estão no singular.']),
+Q('b28','História e Geografia de MT','A fundação de Cuiabá, em 1719, está associada à descoberta de ouro pela bandeira de __________, e sua elevação à categoria de vila, em 1727, ocorreu por ato de __________.',
+ ['Pascoal Moreira Cabral; Rodrigo César de Menezes','Antônio Rolim de Moura; Pascoal Moreira Cabral','Bartolomeu Bueno da Silva; Luís de Albuquerque','Miguel Sutil; Antônio Rolim de Moura'],0,
+ 'A bandeira de Pascoal Moreira Cabral encontrou ouro às margens do rio Coxipó em 1719. Em 1º de janeiro de 1727, o governador da Capitania de São Paulo, Rodrigo César de Menezes, elevou o arraial à Vila Real do Senhor Bom Jesus de Cuiabá.',
+ ['Correta.','Incorreta. Rolim de Moura foi o primeiro governador da Capitania de Mato Grosso e fundador de Vila Bela.','Incorreta. Bartolomeu Bueno está ligado a Goiás.','Incorreta. Miguel Sutil descobriu as Lavras do Sutil em 1722.']),
+Q('b29','História e Geografia de MT','A Rusga, ocorrida em Cuiabá em 1834, foi marcada principalmente por:',
+ ['conflito entre grupos nativistas e portugueses residentes na província, em meio às disputas do período regencial.','revolta de escravizados que resultou na abolição da escravidão na província.','guerra contra o Paraguai pela posse de Corumbá.','movimento pela transferência da capital de Cuiabá para Vila Bela.'],0,
+ 'A Rusga (30 de maio de 1834) foi um levante nativista contra portugueses, chamados de "bicudos", no contexto das tensões políticas da Regência. Em 1835 a capital foi transferida de Vila Bela para Cuiabá.',
+ ['Correta.','Incorreta. A abolição só ocorreu em 1888, em todo o país.','Incorreta. A Guerra do Paraguai começou em 1864.','Incorreta. A transferência foi no sentido contrário, para Cuiabá, em 1835.']),
+Q('b30','História e Geografia de MT','A divisão do estado de Mato Grosso, que deu origem a Mato Grosso do Sul, foi estabelecida por lei complementar federal em:',
+ ['1945.','1964.','1977.','1988.'],2,
+ 'A Lei Complementar nº 31, de 11 de outubro de 1977, sancionada no governo Geisel, criou Mato Grosso do Sul. O novo estado foi instalado em 1º de janeiro de 1979.',
+ ['Incorreta.','Incorreta.','Correta. LC nº 31/1977.','Incorreta. Em 1988 foi criado o Tocantins, a partir de Goiás.']),
+Q('b31','Ética e Filosofia','As frases "O servidor chegou às 8h à repartição" e "É louvável que o servidor seja pontual" exemplificam, respectivamente:',
+ ['juízo de valor e juízo de fato.','juízo de fato e juízo de valor.','dois juízos de fato.','dois juízos de valor.'],1,
+ 'O juízo de fato descreve o que é e pode ser verificado. O juízo de valor avalia o que é bom, belo ou devido, com base em valores.',
+ ['Incorreta. A ordem está trocada.','Correta.','Incorreta. A segunda frase atribui valor.','Incorreta. A primeira frase é descritiva.']),
+Q('b32','Relações Interpessoais','No atendimento a um cidadão irritado com a demora na tramitação de um protocolo, a postura que melhor expressa escuta ativa e empatia é:',
+ ['interromper para explicar de imediato as normas internas.','ouvir sem interromper, demonstrar compreensão do problema e informar com clareza os próximos passos e prazos.','encaminhar a pessoa imediatamente a outro setor para evitar conflito.','responder no mesmo tom, para demonstrar firmeza.'],1,
+ 'Escuta ativa é ouvir com atenção, sem interromper, e confirmar que entendeu. Empatia é reconhecer o sentimento do outro. Um bom atendimento termina com informação clara e encaminhamento concreto.',
+ ['Incorreta. Interromper aumenta o conflito.','Correta.','Incorreta. Transferir sem resolver não é bom atendimento.','Incorreta. Contraria a postura profissional.']),
+Q('b33','Legislação Municipal','Conforme o edital do concurso e a LC nº 93/2003 (Estatuto dos Servidores de Cuiabá), o servidor nomeado e empossado ficará em estágio probatório por:',
+ ['2 anos.','3 anos.','4 anos.','5 anos.'],1,
+ 'O item 16.8 do edital, com base no art. 28 da LC nº 93/2003, fixa o estágio probatório em 3 anos. O prazo coincide com o da estabilidade do art. 41 da CF.',
+ ['Incorreta.','Correta.','Incorreta.','Incorreta.']),
+Q('b34','Poder Legislativo e Processo Legislativo','Segundo o modelo do art. 66 da Constituição Federal, de observância simétrica pelos entes federados, o veto do Chefe do Executivo a projeto aprovado pelo Legislativo:',
+ ['pode ser parcial e recair sobre palavras ou expressões isoladas.','pode ser total ou parcial; o parcial abrange texto integral de artigo, parágrafo, inciso ou alínea.','é definitivo e não pode ser apreciado pelo Legislativo.','é tácito quando o Executivo se omite no prazo constitucional.'],1,
+ 'O art. 66, § 2º, da CF determina que o veto parcial abranja texto integral de artigo, parágrafo, inciso ou alínea. O silêncio do Executivo no prazo importa sanção tácita (§ 3º), e o veto é apreciado pelo Legislativo, que pode derrubá-lo (§ 4º).',
+ ['Incorreta. É vedado vetar palavras isoladas.','Correta. Art. 66, § 2º.','Incorreta. O veto é apreciado e pode ser derrubado.','Incorreta. O silêncio importa sanção tácita.'])
+];
+
+/* Questões adicionais: padrão da prova CMC 2021 (inéditas) e aprofundamento */
+const QX=(id,origem,materia,enunciado,alts,correta,comentario,por)=>({id,materia,enunciado,alternativas:alts,correta,comentario,porAlternativa:por,origem});
+const TXT_AGUA='Texto para as questões\n\nQuando compramos uma camiseta de algodão, raramente pensamos na água gasta para produzi-la. Do cultivo da planta ao tingimento do tecido, milhares de litros foram consumidos antes de a peça chegar à loja. Esse volume, invisível ao consumidor, é chamado de água virtual. Conhecê-lo não significa deixar de consumir, mas consumir com mais critério.\n\n(Texto elaborado para este app)\n\n';
+const EXTRA=[
+QX('p01','padrao','Língua Portuguesa',TXT_AGUA+'De acordo com o texto, a expressão "água virtual" designa:',
+ ['a água que evapora durante o transporte das mercadorias.','o volume de água empregado ao longo da produção de um bem, que não é percebido pelo consumidor.','a água reaproveitada pela indústria têxtil após o tingimento.','a quantidade de água que o consumidor deveria economizar em casa.'],1,
+ 'O texto define água virtual como o volume consumido em toda a cadeia produtiva ("do cultivo da planta ao tingimento") e "invisível ao consumidor". Questões de interpretação da Selecon pedem fidelidade ao que o texto afirma.',
+ ['Incorreta. O texto não fala de evaporação.','Correta. É a definição dada no texto.','Incorreta. Não há menção a reaproveitamento.','Incorreta. O texto trata da produção, não do uso doméstico.']),
+QX('p02','padrao','Língua Portuguesa',TXT_AGUA+'No trecho "Conhecê-lo não significa deixar de consumir", o pronome "lo" retoma:',
+ ['o tecido.','o volume de água virtual.','o consumidor.','o tingimento.'],1,
+ 'O pronome oblíquo "lo" retoma o termo imediatamente anterior a que se refere: "Esse volume [...] chamado de água virtual". É uma questão de coesão referencial, assunto frequente na banca.',
+ ['Incorreta. O tecido não é o que se propõe conhecer.','Correta. Retomada anafórica de "esse volume".','Incorreta. O consumidor é quem conhece, não o que é conhecido.','Incorreta. O tingimento é só uma das etapas citadas.']),
+QX('p03','padrao','Língua Portuguesa',TXT_AGUA+'Em "não significa deixar de consumir, mas consumir com mais critério", a conjunção "mas" estabelece relação de:',
+ ['adição.','oposição.','conclusão.','causa.'],1,
+ '"Mas" é conjunção coordenativa adversativa: opõe a ideia de "deixar de consumir" à de "consumir com mais critério", corrigindo a primeira.',
+ ['Incorreta. A adição seria marcada por "e" ou "além disso".','Correta. Valor adversativo.','Incorreta. A conclusão seria marcada por "portanto" ou "logo".','Incorreta. A causa seria marcada por "porque" ou "pois".']),
+QX('p04','padrao','Raciocínio Lógico e Matemático','Considere verdadeira a proposição: "Se Carlos é técnico legislativo, então Carlos nasceu em Cuiabá." Sabe-se que Carlos não nasceu em Cuiabá. Logo:',
+ ['Carlos é técnico legislativo.','Carlos não é técnico legislativo.','Carlos nasceu em Várzea Grande.','Nada se pode concluir sobre a profissão de Carlos.'],1,
+ 'Pelo modus tollens, se p → q é verdadeira e q é falsa, p é falsa. Como Carlos não nasceu em Cuiabá (¬q), ele não é técnico legislativo (¬p).',
+ ['Incorreta. Isso tornaria a condicional falsa.','Correta. Modus tollens.','Incorreta. Não há informação sobre onde nasceu.','Incorreta. É possível concluir ¬p.']),
+QX('p05','padrao','Raciocínio Lógico e Matemático','A proposição "Ana não é contadora ou Pedro é analista" é logicamente equivalente a:',
+ ['Se Ana é contadora, então Pedro é analista.','Se Pedro é analista, então Ana é contadora.','Ana é contadora e Pedro não é analista.','Se Ana não é contadora, então Pedro é analista.'],0,
+ 'Vale a equivalência ¬p ∨ q ≡ p → q. Com p = "Ana é contadora" e q = "Pedro é analista", fica "Se Ana é contadora, então Pedro é analista".',
+ ['Correta. Equivalência da disjunção com a condicional.','Incorreta. É a recíproca (q → p).','Incorreta. É a negação da proposição.','Incorreta. Seria ¬p → q, que equivale a p ∨ q.']),
+QX('p06','padrao','Noções de Informática','Um servidor da Câmara salvou um relatório em um serviço de armazenamento em nuvem, como o OneDrive ou o Google Drive. Uma característica desse tipo de serviço é:',
+ ['os arquivos ficam acessíveis apenas no computador em que foram criados.','os arquivos podem ser acessados de diferentes dispositivos conectados à internet, mediante autenticação do usuário.','o serviço funciona somente na rede interna do órgão, sem acesso pela internet.','o arquivo é apagado ao desligar o computador.'],1,
+ 'Na computação em nuvem os dados ficam em servidores remotos e podem ser acessados de qualquer dispositivo com internet, depois do login (de preferência com autenticação em dois fatores).',
+ ['Incorreta. Esse é o armazenamento local.','Correta.','Incorreta. A nuvem pública é acessada pela internet.','Incorreta. Os dados persistem no servidor remoto.']),
+QX('p07','padrao','Noções de Informática','Em uma planilha do Excel ou do LibreOffice Calc, as células B2 a B6 contêm, respectivamente, 10, 20, 30, 40 e 50. A fórmula =MÉDIA(B2:B6)-MÍNIMO(B2:B6) retorna:',
+ ['20','30','40','10'],0,
+ 'MÉDIA(B2:B6) = 150/5 = 30 e MÍNIMO(B2:B6) = 10, então 30 − 10 = 20. A Selecon costuma cobrar fórmulas combinadas aplicadas a planilhas.',
+ ['Correta.','Incorreta. 30 é só a média.','Incorreta.','Incorreta. 10 é só o mínimo.']),
+QX('p08','padrao','Noções de Informática','Na célula C2 de uma planilha foi digitada a fórmula =SE(B2>=7;"Aprovado";"Reprovado"). Se B2 contém 6,5, o resultado exibido em C2 é:',
+ ['Aprovado','Reprovado','#VALOR!','6,5'],1,
+ 'A função SE testa a condição B2>=7. Como 6,5 não é maior ou igual a 7, a fórmula devolve o terceiro argumento, "Reprovado".',
+ ['Incorreta. A condição é falsa.','Correta.','Incorreta. A fórmula é válida.','Incorreta. A fórmula devolve texto.']),
+QX('p09','padrao','Legislação Municipal','De acordo com a LC nº 235/2011 (Plano de Cargos, Carreiras e Vencimentos da Câmara Municipal de Cuiabá), a jornada de trabalho dos cargos efetivos é de:',
+ ['20 horas semanais.','30 horas semanais.','40 horas semanais.','44 horas semanais.'],1,
+ 'O item 2.2 do edital, com base no art. 36 da LC nº 235/2011, fixa a jornada em 30 horas semanais, em regime estatutário (LC nº 93/2003).',
+ ['Incorreta.','Correta.','Incorreta.','Incorreta.']),
+QX('p10','padrao','Direito Administrativo e Constitucional','A Câmara Municipal publica em seu portal os contratos firmados, a folha de pagamento e as atas das sessões. Essa conduta concretiza, de forma mais direta, o princípio da:',
+ ['impessoalidade.','publicidade.','eficiência.','moralidade.'],1,
+ 'A publicidade (art. 37, caput, da CF) exige a divulgação oficial dos atos administrativos, condição de eficácia e de controle social. A transparência ativa é a sua expressão mais direta.',
+ ['Incorreta. Impessoalidade é a vedação a favorecimentos e à promoção pessoal.','Correta.','Incorreta. Eficiência diz respeito a resultados e economicidade.','Incorreta. Moralidade diz respeito à probidade e à boa-fé.']),
+QX('p11','padrao','Redação Oficial','Segundo o Manual de Redação da Presidência da República (3ª edição), NÃO é atributo da redação oficial:',
+ ['impessoalidade.','concisão.','formalidade e padronização.','uso de linguagem figurada para dar expressividade ao texto.'],3,
+ 'O Manual lista como atributos: clareza, precisão, objetividade, concisão, coesão e coerência, impessoalidade, formalidade e padronização, e uso da norma-padrão. A linguagem figurada contraria a objetividade e a clareza.',
+ ['Incorreta. É atributo.','Incorreta. É atributo.','Incorreta. É atributo.','Correta. A expressividade literária é incompatível com o texto oficial.']),
+QX('p12','padrao','História e Geografia de MT','Vila Bela da Santíssima Trindade, primeira capital da Capitania de Mato Grosso, foi fundada em 1752 por:',
+ ['Antônio Rolim de Moura.','Pascoal Moreira Cabral.','Rodrigo César de Menezes.','Luís de Albuquerque de Melo Pereira e Cáceres.'],0,
+ 'Antônio Rolim de Moura, primeiro governador da Capitania de Mato Grosso (criada em 1748), fundou Vila Bela às margens do Guaporé em 1752, numa estratégia de ocupação da fronteira oeste.',
+ ['Correta.','Incorreta. Está ligado à fundação de Cuiabá (1719).','Incorreta. Elevou Cuiabá a vila (1727).','Incorreta. Foi governador depois e fundou outros núcleos, como Vila Maria (Cáceres).']),
+QX('p13','padrao','História e Geografia de MT','Os três grandes biomas presentes no território de Mato Grosso são:',
+ ['Amazônia, Cerrado e Pantanal.','Cerrado, Caatinga e Pantanal.','Amazônia, Mata Atlântica e Cerrado.','Pantanal, Pampa e Cerrado.'],0,
+ 'Mato Grosso reúne Amazônia (norte), Cerrado (centro e leste) e Pantanal (sudoeste). Caatinga, Mata Atlântica e Pampa não ocorrem no estado.',
+ ['Correta.','Incorreta. Não há Caatinga em MT.','Incorreta. Não há Mata Atlântica em MT.','Incorreta. O Pampa fica no Sul do país.']),
+QX('p14','padrao','Raciocínio Lógico e Matemático','Uma senha de acesso ao sistema da Câmara deve ter 3 algarismos distintos, escolhidos entre 1, 2, 3, 4 e 5. O número de senhas possíveis é:',
+ ['60','125','15','10'],0,
+ 'Pelo princípio multiplicativo, sem repetição: 5 × 4 × 3 = 60. A resposta 125 (5³) valeria se os algarismos pudessem se repetir.',
+ ['Correta.','Incorreta. Admite repetição.','Incorreta.','Incorreta. Seria C(5,3), em que a ordem não importa.']),
+QX('d01','aprof','Poder Legislativo e Processo Legislativo','Sobre a estruturação das leis prevista no art. 7º da LC nº 95/1998, é correto afirmar que:',
+ ['excetuadas as codificações, cada lei tratará de um único objeto.','a lei pode conter matéria estranha ao seu objeto, desde que aprovada por maioria absoluta.','um mesmo assunto pode ser disciplinado por várias leis independentes, sem remissão entre elas.','o âmbito de aplicação da lei deve ser deixado para o regulamento.'],0,
+ 'O art. 7º, I, estabelece que, excetuadas as codificações, cada lei tratará de um único objeto. O inciso II proíbe matéria estranha ao objeto, e o IV impede que o mesmo assunto seja disciplinado por mais de uma lei, salvo lei complementar à básica, com remissão expressa.',
+ ['Correta.','Incorreta. A matéria estranha é vedada, sem exceção de quórum.','Incorreta. Exige-se remissão expressa à lei básica.','Incorreta. O âmbito de aplicação é indicado na própria lei (parte preliminar).']),
+QX('d02','aprof','Poder Legislativo e Processo Legislativo','Um projeto de lei pretende inserir novo artigo entre os arts. 5º e 6º de uma lei municipal, sem renumerar os demais. Segundo a LC nº 95/1998, o novo dispositivo deve ser numerado como:',
+ ['Art. 5º-A.','Art. 6º, renumerando-se os seguintes.','Art. 5º, parágrafo único.','Art. 5.1.'],0,
+ 'O art. 12, III, "b", da LC nº 95/1998 veda renumerar artigos. Usa-se o número do artigo anterior seguido de letra maiúscula (Art. 5º-A). O artigo alterado leva "(NR)" ao final.',
+ ['Correta.','Incorreta. A renumeração é vedada.','Incorreta. Parágrafo é desdobramento de artigo, não artigo novo.','Incorreta. A notação decimal não é usada.']),
+QX('d03','aprof','Poder Legislativo e Processo Legislativo','De acordo com o art. 29-A, § 1º, da Constituição Federal, a Câmara Municipal não gastará com folha de pagamento, incluído o subsídio de seus Vereadores, mais do que:',
+ ['50% de sua receita.','60% de sua receita.','70% de sua receita.','80% de sua receita.'],2,
+ 'O § 1º do art. 29-A limita a 70% da receita da Câmara os gastos com folha, incluído o subsídio dos Vereadores. O caput fixa limites para o total da despesa do Legislativo conforme a população.',
+ ['Incorreta.','Incorreta.','Correta.','Incorreta.']),
+QX('d04','aprof','Poder Legislativo e Processo Legislativo','Quanto ao subsídio dos Vereadores, a Constituição Federal (art. 29, VI) determina que seja fixado:',
+ ['pelo Prefeito, por decreto, a cada ano.','pela Câmara Municipal em cada legislatura para a subsequente, observados limites máximos em função da população do Município.','pela Assembleia Legislativa, para todos os municípios do estado.','livremente pela Câmara, sem limite constitucional.'],1,
+ 'Pela regra da anterioridade da legislatura, a Câmara fixa o subsídio para a legislatura seguinte, dentro de percentuais do subsídio dos Deputados Estaduais escalonados pela população (alíneas do inciso VI).',
+ ['Incorreta. A fixação é competência da Câmara.','Correta.','Incorreta. A competência é municipal.','Incorreta. Há limites escalonados.']),
+QX('d05','aprof','Direito Administrativo e Constitucional','Sobre a extinção de atos administrativos, assinale a afirmativa correta.',
+ ['A revogação atinge atos ilegais e produz efeitos retroativos.','A anulação decorre de conveniência e oportunidade e só pode ser feita pelo Judiciário.','A revogação decorre de conveniência e oportunidade, produz efeitos ex nunc e não pode ser feita pelo Judiciário no exercício da função jurisdicional.','Atos vinculados podem ser revogados a qualquer tempo.'],2,
+ 'A Súmula 473 do STF diz que a Administração pode anular seus atos ilegais e revogá-los por conveniência e oportunidade, respeitados os direitos adquiridos. A anulação (por ilegalidade) tem efeitos ex tunc e pode ser feita pela Administração ou pelo Judiciário. A revogação (por mérito) tem efeitos ex nunc e é exclusiva da Administração.',
+ ['Incorreta. Isso descreve a anulação.','Incorreta. A anulação decorre de ilegalidade e também pode ser feita pela Administração.','Correta.','Incorreta. Atos vinculados não admitem revogação.']),
+QX('d06','aprof','Direito Administrativo e Constitucional','Conforme o art. 37, XIX, da Constituição Federal:',
+ ['empresas públicas são criadas diretamente por lei específica.','somente por lei específica poderá ser criada autarquia e autorizada a instituição de empresa pública, de sociedade de economia mista e de fundação.','autarquias podem ser criadas por decreto do Chefe do Executivo.','sociedades de economia mista dispensam autorização legislativa.'],1,
+ 'A lei específica cria diretamente a autarquia. Para empresa pública, sociedade de economia mista e fundação, a lei apenas autoriza, e a criação depende do registro dos atos constitutivos.',
+ ['Incorreta. A lei apenas autoriza.','Correta.','Incorreta. É exigida lei específica.','Incorreta. A autorização legislativa é exigida.']),
+QX('d07','aprof','Direito Administrativo e Constitucional','Segundo a Súmula 525 do STJ, a Câmara de Vereadores:',
+ ['tem personalidade jurídica própria e responde por seus atos em qualquer ação.','não possui personalidade jurídica, apenas personalidade judiciária, e só pode demandar em juízo para defender seus direitos institucionais.','é pessoa jurídica de direito privado.','não pode, em nenhuma hipótese, figurar em processo judicial.'],1,
+ 'A Câmara é órgão do Município, sem personalidade jurídica. Tem, porém, capacidade processual (personalidade judiciária) para defender suas prerrogativas institucionais. Nas demais demandas quem responde é o Município.',
+ ['Incorreta.','Correta. Literalidade da Súmula 525/STJ.','Incorreta.','Incorreta. Pode atuar na defesa de direitos institucionais.']),
+QX('d08','aprof','Poder Legislativo e Processo Legislativo','Sobre a fiscalização do Município, a Constituição Federal (art. 31) estabelece que:',
+ ['o controle externo é exercido exclusivamente pelo Tribunal de Contas, sem participação da Câmara.','é vedada a criação de Tribunais, Conselhos ou órgãos de Contas Municipais.','o parecer prévio do Tribunal de Contas vincula a Câmara em qualquer hipótese.','as contas do Município ficam sigilosas até o julgamento.'],1,
+ 'O § 4º do art. 31 veda a criação de novos tribunais de contas municipais (os já existentes, como os de São Paulo e do Rio de Janeiro, foram mantidos). O controle externo é da Câmara, com auxílio do Tribunal de Contas. As contas ficam 60 dias à disposição de qualquer contribuinte (§ 3º).',
+ ['Incorreta. O titular do controle externo é a Câmara.','Correta.','Incorreta. Pode ser afastado por 2/3 dos membros da Câmara.','Incorreta. Há publicidade das contas.']),
+QX('d09','aprof','Direito Administrativo e Constitucional','Um cidadão quer conhecer e retificar informações sobre sua pessoa constantes de banco de dados de entidade governamental. O remédio constitucional adequado é o:',
+ ['mandado de injunção.','habeas data.','habeas corpus.','mandado de segurança coletivo.'],1,
+ 'O art. 5º, LXXII, da CF prevê o habeas data para assegurar o conhecimento e a retificação de informações relativas ao impetrante, constantes de registros ou bancos de dados de entidades governamentais ou de caráter público.',
+ ['Incorreta. Supre a falta de norma regulamentadora.','Correta.','Incorreta. Protege a liberdade de locomoção.','Incorreta. Defende direito líquido e certo de uma coletividade.']),
+QX('d10','aprof','Redação Oficial','Durante a lavratura manuscrita de uma ata de sessão, o redator percebe que escreveu um nome errado. A forma tradicionalmente recomendada para a correção imediata é:',
+ ['apagar com corretivo e reescrever.','usar a expressão "digo", seguida da forma correta.','deixar a correção para um anexo separado.','riscar várias vezes a palavra até torná-la ilegível.'],1,
+ 'A ata não admite rasuras, emendas ou espaços em branco. O erro percebido durante a escrita é corrigido com "digo". A omissão notada depois da redação é suprida com "em tempo", ao final do texto.',
+ ['Incorreta. Corretivo configura rasura.','Correta.','Incorreta. A correção é feita no próprio corpo da ata.','Incorreta. Rasuras comprometem a validade.']),
+QX('d11','aprof','Redação Oficial','De acordo com o Manual de Redação da Presidência da República (3ª edição), é correto afirmar que:',
+ ['"Doutor" é forma de tratamento obrigatória para autoridades.','"Doutor" não é forma de tratamento, e sim título acadêmico, e deve ser evitado indiscriminadamente.','"Ilustríssimo" é o tratamento obrigatório para vereadores.','"Digníssimo" deve acompanhar o nome de autoridades em ofícios.'],1,
+ 'O Manual esclarece que "doutor" é título acadêmico, não forma de tratamento. Também dispensa formas como "ilustríssimo" e "digníssimo", em nome da simplicidade.',
+ ['Incorreta.','Correta.','Incorreta. O Manual dispensa "ilustríssimo".','Incorreta. O Manual dispensa "digníssimo".']),
+QX('d12','aprof','Arquivologia e Atendimento','O princípio arquivístico segundo o qual os documentos produzidos por uma entidade devem ser mantidos juntos, sem se misturar aos de outras entidades, é o princípio da:',
+ ['proveniência (respeito aos fundos).','pertinência temática.','ordem alfabética.','acessibilidade.'],0,
+ 'A proveniência (ou respeito aos fundos) organiza os arquivos pela origem produtora. A organização por assunto (pertinência) é típica de bibliotecas e de coleções, não de arquivos.',
+ ['Correta.','Incorreta. Contraria a proveniência.','Incorreta. É método de ordenação, não princípio.','Incorreta. Não é princípio arquivístico clássico.']),
+QX('d13','aprof','Arquivologia e Atendimento','Nos termos da Lei nº 8.159/1991 (Política Nacional de Arquivos), os documentos de valor permanente são:',
+ ['alienáveis por decisão do dirigente do órgão.','inalienáveis e imprescritíveis.','elimináveis após cinco anos.','de acesso proibido ao público.'],1,
+ 'O art. 10 da Lei nº 8.159/1991 dispõe que os documentos de valor permanente são inalienáveis e imprescritíveis. Por isso não podem ser eliminados nem vendidos.',
+ ['Incorreta.','Correta.','Incorreta. Documentos permanentes não são eliminados.','Incorreta. O acesso segue a legislação, com restrições pontuais.']),
+QX('d14','aprof','Arquivologia e Atendimento','Sobre os métodos de arquivamento, é correto afirmar que o método alfabético:',
+ ['é indireto, pois exige consulta prévia a um índice.','é direto, pois permite localizar o documento sem consulta a índice auxiliar.','só pode ser usado para documentos sigilosos.','dispensa qualquer regra de ordenação de nomes.'],1,
+ 'No método alfabético a busca é feita diretamente pelo nome. Métodos numéricos costumam ser indiretos, exigindo índice. A ordenação segue regras próprias (por exemplo, pelo último sobrenome).',
+ ['Incorreta. Essa é característica do método numérico.','Correta.','Incorreta.','Incorreta. Há regras de alfabetação.']),
+QX('d15','aprof','Contabilidade Pública','Pela Lei nº 4.320/1964, as despesas empenhadas e não pagas até 31 de dezembro:',
+ ['são canceladas automaticamente.','constituem restos a pagar, distinguindo-se as processadas das não processadas.','transformam-se em créditos extraordinários.','são reclassificadas como receita do exercício seguinte.'],1,
+ 'O art. 36 da Lei nº 4.320/1964 define restos a pagar como as despesas empenhadas e não pagas até 31 de dezembro. As processadas já foram liquidadas; as não processadas ainda não.',
+ ['Incorreta.','Correta.','Incorreta. Créditos extraordinários são créditos adicionais para despesas urgentes e imprevisíveis.','Incorreta.']),
+QX('d16','aprof','Contabilidade Pública','Os créditos adicionais destinados a despesas urgentes e imprevisíveis, como em caso de guerra, comoção intestina ou calamidade pública, são os créditos:',
+ ['suplementares.','especiais.','extraordinários.','ordinários.'],2,
+ 'Pelo art. 41 da Lei nº 4.320/1964: os suplementares reforçam dotação existente; os especiais atendem despesas sem dotação específica; os extraordinários atendem despesas urgentes e imprevistas.',
+ ['Incorreta. Reforçam dotação já existente.','Incorreta. Cobrem despesa sem dotação específica.','Correta.','Incorreta. Não é espécie de crédito adicional.']),
+QX('d17','aprof','Contabilidade Pública','Segundo o art. 35 da Lei nº 4.320/1964, pertencem ao exercício financeiro:',
+ ['as receitas nele lançadas e as despesas nele pagas.','as receitas nele arrecadadas e as despesas nele legalmente empenhadas.','as receitas previstas e as despesas fixadas na LOA.','apenas as despesas liquidadas.'],1,
+ 'A lei adota o regime misto: a receita entra no exercício pela arrecadação (regime de caixa) e a despesa pelo empenho (regime de competência orçamentária).',
+ ['Incorreta.','Correta.','Incorreta. Previsão e fixação são etapas de planejamento.','Incorreta.']),
+QX('d18','aprof','Segurança do Trabalho e Fotografia','Sobre o Equipamento de Proteção Individual (EPI), conforme a NR-6, é correto afirmar que:',
+ ['o trabalhador deve comprar o próprio EPI.','o empregador deve fornecer gratuitamente o EPI adequado ao risco, em perfeito estado de conservação e funcionamento.','o EPI substitui as medidas de proteção coletiva em qualquer caso.','o EPI dispensa treinamento para o uso.'],1,
+ 'A NR-6 obriga o empregador a fornecer o EPI gratuitamente, adequado ao risco e em perfeito estado, além de orientar e treinar o trabalhador. As medidas coletivas têm prioridade sobre as individuais.',
+ ['Incorreta.','Correta.','Incorreta. A proteção coletiva tem prioridade.','Incorreta. O treinamento é obrigatório.']),
+QX('d19','aprof','Segurança do Trabalho e Fotografia','Na fotografia institucional digital, aumentar o valor do ISO da câmera tende a:',
+ ['diminuir a sensibilidade do sensor e eliminar o ruído.','aumentar a sensibilidade do sensor à luz, com possível aumento de ruído na imagem.','alterar apenas o enquadramento da foto.','reduzir a profundidade de campo sem afetar a exposição.'],1,
+ 'O ISO controla a sensibilidade do sensor. ISO alto ajuda em ambientes escuros, como plenários e auditórios, mas aumenta o ruído. Abertura e velocidade completam o triângulo da exposição.',
+ ['Incorreta. É o contrário.','Correta.','Incorreta. Enquadramento é composição.','Incorreta. A profundidade de campo depende da abertura.']),
+QX('d20','aprof','Noções de Informática','Pela LGPD (Lei nº 13.709/2018), o titular dos dados pessoais tem direito a obter do controlador, entre outros:',
+ ['a venda de seus dados a terceiros.','a confirmação da existência de tratamento, o acesso aos dados e a correção de dados incompletos, inexatos ou desatualizados.','a exclusão de qualquer registro público, inclusive atas legislativas.','a dispensa de tratamento por órgãos públicos em qualquer hipótese.'],1,
+ 'O art. 18 da LGPD garante, entre outros direitos, a confirmação da existência de tratamento, o acesso e a correção. O poder público pode tratar dados para executar políticas públicas e cumprir obrigações legais.',
+ ['Incorreta.','Correta.','Incorreta. A eliminação tem limites legais e não alcança registros públicos obrigatórios.','Incorreta.']),
+QX('d21','aprof','Raciocínio Lógico e Matemático','A negação de "O vereador votou e a sessão foi encerrada" é:',
+ ['O vereador não votou e a sessão não foi encerrada.','O vereador não votou ou a sessão não foi encerrada.','Se o vereador votou, a sessão foi encerrada.','O vereador votou ou a sessão foi encerrada.'],1,
+ 'Pela lei de De Morgan, ¬(p ∧ q) ≡ ¬p ∨ ¬q. A conjunção só é falsa se pelo menos uma das partes for falsa.',
+ ['Incorreta. Esse é um erro comum: troca-se também o conectivo.','Correta.','Incorreta.','Incorreta.']),
+QX('d22','aprof','Língua Portuguesa','Está de acordo com a regência prescrita pela norma-padrão:',
+ ['Os servidores assistiram à sessão solene.','Prefiro mais o turno da manhã do que o da tarde.','Todos devem obedecer o Regimento Interno.','O candidato aspirava o cargo de técnico.'],0,
+ '"Assistir" no sentido de ver é transitivo indireto ("assistir a"), por isso "à sessão". "Preferir" rejeita "mais" e "do que" (prefere-se algo a outro); "obedecer" pede "a" ("ao Regimento"); "aspirar", no sentido de desejar, pede "a" ("ao cargo").',
+ ['Correta.','Incorreta.','Incorreta.','Incorreta.']),
+QX('d23','aprof','Língua Portuguesa','Quanto à colocação pronominal, está de acordo com a norma-padrão:',
+ ['Me informaram que a sessão foi adiada.','Nunca se viu tamanha participação popular na audiência.','Não esqueça-se de protocolar o requerimento.','Quem disse-lhe que o prazo terminou?'],1,
+ 'Palavras negativas (nunca, não) e pronomes interrogativos atraem o pronome (próclise). A norma-padrão não inicia frase com pronome oblíquo átono.',
+ ['Incorreta. Frase não começa com pronome átono.','Correta. "Nunca" atrai o pronome.','Incorreta. O certo é "Não se esqueça".','Incorreta. O certo é "Quem lhe disse".']),
+QX('d24','aprof','Ética e Filosofia','No racionalismo ético de Immanuel Kant, o imperativo categórico orienta a agir:',
+ ['de modo a maximizar o prazer do maior número de pessoas.','segundo uma máxima que se possa querer, ao mesmo tempo, como lei universal.','conforme os costumes da comunidade, sem crítica.','de acordo com os interesses pessoais de cada indivíduo.'],1,
+ 'Em Kant, o dever moral vem da razão: age-se segundo máximas universalizáveis, tratando a humanidade sempre como fim e nunca só como meio. A ideia de maximizar o prazer do maior número descreve o utilitarismo.',
+ ['Incorreta. Isso é utilitarismo.','Correta.','Incorreta. Isso é convencionalismo.','Incorreta. Isso é egoísmo ético.'])
+,
+QX('u01','ufmt','Língua Portuguesa','Sobre a acentuação gráfica após o Acordo Ortográfico, marque V para verdadeiro e F para falso.\n\n( ) A palavra "ideia" não é mais acentuada.\n( ) A palavra "voo" perdeu o acento circunflexo.\n( ) A forma verbal "para" (do verbo parar) mantém o acento diferencial.\n( ) O verbo "pôr" mantém o acento diferencial.\n\nAssinale a sequência correta.',
+ ['V, V, F, V','V, F, F, V','F, V, V, F','V, V, V, V'],0,
+ 'O Acordo eliminou o acento dos ditongos abertos "ei" e "oi" nas paroxítonas (ideia), o circunflexo de "oo" e "ee" (voo, leem) e o diferencial de "para". Ficaram os diferenciais de "pôr" e "pôde".',
+ ['Correta.','Incorreta. "Voo" de fato perdeu o acento.','Incorreta.','Incorreta. "Para" perdeu o acento diferencial.']),
+QX('u02','ufmt','Língua Portuguesa','Na frase "O Plenário decidiu ratificar o parecer da comissão", o verbo destacado significa:',
+ ['confirmar.','corrigir.','revogar.','suspender.'],0,
+ 'Ratificar é confirmar ou validar; retificar é corrigir. Esse par de parônimos aparece com frequência em provas de órgãos públicos.',
+ ['Correta.','Incorreta. Esse é o sentido de "retificar".','Incorreta.','Incorreta.']),
+QX('u03','ufmt','Língua Portuguesa','Assinale a frase corretamente pontuada.',
+ ['Os vereadores, aprovaram o projeto.','Os vereadores aprovaram, o projeto.','Na sessão de ontem, os vereadores aprovaram o projeto.','Na sessão, de ontem os vereadores aprovaram o projeto.'],2,
+ 'Não se separa sujeito de verbo, nem verbo de complemento. O adjunto adverbial deslocado para o início ("Na sessão de ontem") pode vir isolado por vírgula.',
+ ['Incorreta. A vírgula separa sujeito e verbo.','Incorreta. A vírgula separa verbo e objeto.','Correta.','Incorreta. A vírgula quebra o adjunto adverbial.']),
+QX('u04','ufmt','Noções de Informática','Marque V para verdadeiro e F para falso.\n\n( ) Os atalhos Ctrl+C e Ctrl+V copiam e colam, respectivamente.\n( ) A extensão .xlsx é típica de arquivos do Microsoft Excel.\n( ) A memória RAM é volátil: perde o conteúdo quando o computador é desligado.\n( ) Um vírus só infecta o computador se ele estiver desconectado da internet.\n\nAssinale a sequência correta.',
+ ['V, V, V, F','V, F, V, F','V, V, F, F','F, V, V, V'],0,
+ 'As três primeiras afirmações são verdadeiras. A quarta é falsa: a internet, o e-mail e as mídias removíveis são justamente os principais meios de propagação de malware.',
+ ['Correta.','Incorreta. A extensão .xlsx é do Excel.','Incorreta. A memória RAM é volátil.','Incorreta. Ctrl+C e Ctrl+V copiam e colam.']),
+QX('u05','ufmt','Noções de Informática','No Microsoft Word em português, o atalho de teclado para aplicar negrito ao texto selecionado é:',
+ ['Ctrl+N','Ctrl+B','Ctrl+P','Ctrl+G'],0,
+ 'No Word em português: Ctrl+N aplica negrito, Ctrl+I itálico, Ctrl+S sublinhado, Ctrl+B salva e Ctrl+P imprime. No LibreOffice Writer e no Word em inglês, o negrito é Ctrl+B.',
+ ['Correta.','Incorreta. No Word em português, Ctrl+B salva.','Incorreta. Ctrl+P imprime.','Incorreta. Ctrl+G alinha à direita.']),
+QX('u06','ufmt','Noções de Informática','Ao enviar um e-mail para vários cidadãos sem que um veja o endereço dos outros, o servidor deve colocar os destinatários no campo:',
+ ['Para.','Cc.','Cco.','Assunto.'],2,
+ 'Cco (com cópia oculta) esconde os destinatários entre si. Isso protege dados pessoais, em linha com a LGPD. O campo Cc mostra a todos quem recebeu a cópia.',
+ ['Incorreta. Todos veem os endereços.','Incorreta. A cópia é visível.','Correta.','Incorreta. Não é campo de destinatário.']),
+QX('u07','ufmt','História e Geografia de MT','Na economia brasileira, Mato Grosso se destaca nacionalmente como o maior produtor de:',
+ ['soja.','café.','cacau.','uva.'],0,
+ 'Mato Grosso lidera há anos a produção nacional de soja e também tem grande peso em milho, algodão e bovinos. A expansão da fronteira agrícola é tema recorrente na banca.',
+ ['Correta.','Incorreta. O café se concentra em MG, ES e SP.','Incorreta. O cacau se concentra na BA e no PA.','Incorreta. A uva se concentra no RS.']),
+QX('u08','ufmt','História e Geografia de MT','Sobre o Pantanal, é correto afirmar:',
+ ['É uma planície sujeita a inundações periódicas, presente nos estados de Mato Grosso e Mato Grosso do Sul.','Localiza-se no extremo norte de Mato Grosso, na divisa com o Pará.','É um bioma de clima semiárido, com chuvas escassas o ano todo.','Ocupa a maior parte do território mato-grossense.'],0,
+ 'O Pantanal é uma grande planície alagável da bacia do rio Paraguai, no sudoeste de MT e no MS, com extensão para a Bolívia e o Paraguai. O ciclo de cheias e secas define sua dinâmica.',
+ ['Correta.','Incorreta. O norte de MT é amazônico.','Incorreta. Semiárido é característica da Caatinga.','Incorreta. Cerrado e Amazônia ocupam áreas maiores.']),
+QX('u09','ufmt','História e Geografia de MT','Cuiabá é frequentemente associada a um marco geográfico do continente. Trata-se do:',
+ ['Centro Geodésico da América do Sul.','ponto mais alto do Brasil.','marco zero da Rodovia Transamazônica.','ponto extremo oeste do Brasil.'],0,
+ 'O Centro Geodésico da América do Sul, calculado pela Comissão Rondon no início do século XX, tem marco em Cuiabá. O ponto mais alto do Brasil é o Pico da Neblina (AM), e o extremo oeste fica no Acre.',
+ ['Correta.','Incorreta.','Incorreta.','Incorreta.']),
+QX('u10','ufmt','Poder Legislativo e Processo Legislativo','Sobre o Poder Legislativo municipal, marque V para verdadeiro e F para falso.\n\n( ) A Câmara exerce o controle externo do Município com auxílio do Tribunal de Contas.\n( ) O Prefeito preside a Câmara Municipal.\n( ) Os vereadores são eleitos para mandato de quatro anos.\n( ) A Lei Orgânica do Município é promulgada pela Câmara Municipal.\n\nAssinale a sequência correta.',
+ ['V, F, V, V','V, V, V, F','F, F, V, V','V, F, F, V'],0,
+ 'O controle externo é da Câmara, com auxílio do Tribunal de Contas (CF, art. 31). A Câmara é presidida por um vereador eleito pelos pares; o Prefeito chefia o Executivo. O mandato é de quatro anos (CF, art. 29, I). A Lei Orgânica é promulgada pela própria Câmara (CF, art. 29).',
+ ['Correta.','Incorreta. O Prefeito não preside a Câmara.','Incorreta. A primeira afirmação é verdadeira.','Incorreta. O mandato é de quatro anos.']),
+QX('u11','ufmt','Redação Oficial','O documento pelo qual uma pessoa física ou jurídica solicita algo a uma autoridade pública, com base em direito ou interesse, denomina-se:',
+ ['requerimento.','ata.','relatório.','certidão.'],0,
+ 'O requerimento formaliza um pedido à autoridade. A ata registra o que ocorreu em uma reunião; o relatório expõe atividades ou fatos; a certidão atesta fatos constantes de registros.',
+ ['Correta.','Incorreta. A ata é um registro de reunião.','Incorreta. O relatório é uma exposição de fatos.','Incorreta. A certidão é um atestado de registro.']),
+QX('u12','ufmt','Arquivologia e Atendimento','Ao atender uma ligação telefônica no setor de protocolo da Câmara, a conduta mais adequada do servidor é:',
+ ['identificar o órgão ou setor e o próprio nome, ouvir a demanda e oferecer a informação ou o encaminhamento correto.','atender com "alô" e transferir a ligação para o primeiro ramal disponível.','pedir que o cidadão ligue mais tarde, para evitar interromper o trabalho.','fornecer dados pessoais de terceiros para agilizar o atendimento.'],0,
+ 'O bom atendimento telefônico começa com identificação clara, escuta atenta e solução ou encaminhamento correto. Repassar dados pessoais de terceiros viola a LGPD.',
+ ['Correta.','Incorreta. A transferência sem triagem é um atendimento ruim.','Incorreta. Contraria a eficiência.','Incorreta. Viola a proteção de dados.'])
+];
+
+/* Temas de discursiva: propostas de treino e leituras */
+const L={
+ mrpr:{t:'Manual de Redação da Presidência da República, 3ª ed. (PDF)',u:'https://files.ufgd.edu.br/arquivos/arquivos/78/PROTOCOLO/Normas%20Internas/Manual%20de%20Reda%C3%A7%C3%A3o%20da%20Presid%C3%AAncia%20da%20Rep%C3%BAblica%20-%203%C2%AA%20edi%C3%A7%C3%A3o,%20revista,%20atualizada%20e%20ampliada.pdf'},
+ lo:{t:'Lei Orgânica de Cuiabá, versão atualizada (PDF)',u:'https://legislativo.camaracuiaba.mt.gov.br/Arquivo/Documents/PELOM/PELOM42023/589610-202309191334174787.pdf'},
+ cf:{t:'Constituição Federal (Planalto)',u:'https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm'},
+ tec:{t:'Manual de Técnica Legislativa (Senado)',u:'https://www12.senado.leg.br/institucional/estrutura/SF/OAS/CONLEG/arquivos/manuais/tecnica-legislativa'},
+ ofic:{t:'Oficina de Técnica Legislativa 2026 (Interlegis)',u:'https://2026.engitec.interlegis.leg.br/material-do-evento/20-de-maio/oficinas/oficina-de-tecnica-legislativa.pdf/@@download/file'},
+ parl:{t:'Manual de Redação Parlamentar e Legislativa (Senado)',u:'https://www12.senado.leg.br/institucional/estrutura/SF/OAS/CONLEG/arquivos/manuais/manual-de-redacao-parlamentar-e-legislativa'},
+ ebooks:{t:'E-books gratuitos sobre o Legislativo (Câmara dos Deputados)',u:'https://www2.camara.leg.br/a-camara/programas-institucionais/noticias/6-e-books-gratuitos-para-entender-mais-sobre-o-legislativo-1'},
+ saberes:{t:'Cursos gratuitos do ILB/Senado (Saberes)',u:'https://saberes.senado.leg.br'},
+ arq:{t:'Dicionário Brasileiro de Terminologia Arquivística (Arquivo Nacional)',u:'https://www.gov.br/arquivonacional/pt-br/servicos/gestao-de-documentos/orientacao-tecnica-1/publicacoes-tecnicas-de-referencia/copy_of_dicionrio_de_terminologia_arquivistica.pdf'},
+ sst:{t:'Noções básicas de SST (Fundacentro/Enap)',u:'https://repositorio.enap.gov.br/handle/1/7642'},
+ evg:{t:'Escola Virtual de Governo (Enap): cursos gratuitos',u:'https://www.escolavirtual.gov.br'}
+};
+const TEMAS=[
+ {id:'t1',titulo:'Processo legislativo municipal',porque:'Faz parte das atribuições ("técnica legislativa") e de dois itens do conteúdo específico.',
+  proposta:'Com base na Constituição Federal e na Lei Orgânica do Município de Cuiabá, redija um texto dissertativo explicando as etapas do processo de elaboração de uma lei ordinária municipal, da iniciativa à publicação, e destacando o papel das comissões permanentes nesse percurso.',
+  pontos:['Espécies normativas do art. 23 da Lei Orgânica','Iniciativa (vereador, prefeito, mesa, iniciativa popular)','Tramitação: comissões, discussão e votação em plenário','Sanção ou veto, promulgação e publicação','Papel técnico das comissões e do apoio administrativo'],leituras:['lo','cf','ebooks','saberes']},
+ {id:'t2',titulo:'Funções da Câmara Municipal e controle externo',porque:'O edital cobra organização do Legislativo municipal e controle da Administração.',
+  proposta:'Discorra sobre as funções da Câmara Municipal, com destaque para a função fiscalizadora. Explique como se dá o controle externo das contas do Município e a participação do Tribunal de Contas nesse processo.',
+  pontos:['Funções legislativa, fiscalizadora, julgadora e administrativa','Art. 31 da CF: controle externo pela Câmara com auxílio do Tribunal de Contas','Parecer prévio e o quórum de 2/3 para afastá-lo','Transparência e controle social']},
+ {id:'t3',titulo:'Comissões permanentes e temporárias',porque:'"Dar suporte ao trabalho das Comissões" é a primeira atribuição do cargo.',
+  proposta:'Explique a importância das comissões permanentes e temporárias no funcionamento da Câmara Municipal e descreva como o Técnico Legislativo pode contribuir para o trabalho desses colegiados.',
+  pontos:['Diferença entre comissões permanentes e temporárias','Análise de proposições, pareceres e audiências públicas','Secretariado, pauta, atas, sinopses e arquivo','Eficiência e publicidade dos trabalhos'],leituras:['ebooks','saberes','lo']},
+ {id:'t4',titulo:'Redação oficial na comunicação pública',porque:'Aparece duas vezes no conteúdo específico (itens 8 e 14).',
+  proposta:'Considerando o Manual de Redação da Presidência da República, discorra sobre os atributos da redação oficial e explique por que eles são indispensáveis à comunicação entre a Câmara Municipal, outros órgãos públicos e os cidadãos.',
+  pontos:['Clareza, precisão, objetividade e concisão','Impessoalidade, formalidade e padronização','Padrão ofício e pronomes de tratamento','Relação com os princípios da impessoalidade e da publicidade'],leituras:['mrpr','parl']},
+ {id:'t5',titulo:'Atas e sinopses das sessões',porque:'"Redigir textos e sinopses de atas" está nas atribuições do cargo.',
+  proposta:'Discorra sobre a função das atas e sinopses no registro das atividades legislativas, abordando suas características de redação e sua importância para a memória institucional e a transparência.',
+  pontos:['Conceito de ata e de sinopse','Fidelidade, objetividade e ausência de rasuras ("digo", "em tempo")','Valor probatório e memória institucional','Publicidade e acesso pelo cidadão'],leituras:['mrpr','parl','arq']},
+ {id:'t6',titulo:'Gestão documental, protocolo e arquivo',porque:'Arquivologia é tópico específico e o cargo inclui "arquivar".',
+  proposta:'Explique o ciclo de vida dos documentos na Administração Pública, segundo a teoria das três idades, e discorra sobre a importância do protocolo e da tabela de temporalidade para a gestão documental da Câmara Municipal.',
+  pontos:['Arquivos corrente, intermediário e permanente','Protocolo: recebimento, registro, distribuição, tramitação e expedição','Avaliação e tabela de temporalidade','Documentos permanentes: inalienáveis e imprescritíveis (Lei 8.159/1991)'],leituras:['arq','evg']},
+ {id:'t7',titulo:'Atendimento ao público no Legislativo',porque:'Atendimento, recepção e relações interpessoais aparecem nos específicos e nos gerais.',
+  proposta:'Discorra sobre as características de um atendimento ao público de qualidade na Câmara Municipal, relacionando a postura profissional do servidor com os princípios da Administração Pública.',
+  pontos:['Escuta ativa, empatia e comunicação clara','Impessoalidade, eficiência e cortesia','Encaminhamento correto e informação sobre prazos','Imagem institucional e confiança do cidadão'],leituras:['evg','saberes']},
+ {id:'t8',titulo:'Princípios da Administração Pública',porque:'O art. 37 da CF é base de quase todo o conteúdo específico.',
+  proposta:'Explique os princípios expressos no caput do art. 37 da Constituição Federal e mostre, com exemplos do cotidiano de uma Câmara Municipal, como eles orientam a atuação do servidor público.',
+  pontos:['Legalidade, impessoalidade, moralidade, publicidade e eficiência','Exemplo prático para cada princípio','Concurso público, estabilidade e estágio probatório','Consequências do descumprimento'],leituras:['cf','evg']},
+ {id:'t9',titulo:'Responsabilidade civil do Estado',porque:'O tópico 4 do conteúdo específico trata de controle e responsabilidade civil.',
+  proposta:'Discorra sobre a responsabilidade civil do Estado prevista no art. 37, § 6º, da Constituição Federal, explicando a diferença entre a responsabilidade da Administração e a do servidor que causou o dano.',
+  pontos:['Responsabilidade objetiva da pessoa jurídica','Nexo causal e dano','Ação regressiva contra o agente: dolo ou culpa','Câmara como órgão: quem responde é o Município'],leituras:['cf','evg']},
+ {id:'t10',titulo:'Orçamento público e despesa',porque:'Noções de contabilidade pública (receita, despesa e orçamento) é tópico específico.',
+  proposta:'Explique a relação entre PPA, LDO e LOA no planejamento orçamentário e descreva os estágios da despesa pública, ressaltando a importância do empenho.',
+  pontos:['PPA, LDO e LOA: finalidade e articulação','Princípios orçamentários, como o da exclusividade','Empenho, liquidação e pagamento (Lei 4.320/1964)','Controle e transparência dos gastos da Câmara'],leituras:['cf','evg']},
+ {id:'t11',titulo:'Segurança e saúde no trabalho na Câmara',porque:'Higiene e segurança do trabalho constam das atribuições e dos tópicos.',
+  proposta:'Discorra sobre a importância da prevenção de acidentes e doenças do trabalho no ambiente de uma Câmara Municipal, citando medidas de proteção coletiva e individual.',
+  pontos:['Riscos do ambiente administrativo (ergonômicos, elétricos, incêndio)','Prioridade da proteção coletiva; EPI como complemento','CIPA e mapa de riscos','Benefícios para o servidor e para o serviço público'],leituras:['sst']}
+];
+TEMAS.forEach(t=>{if(!t.leituras)t.leituras=['cf','saberes'];});
+
+/* Flashcards de base */
+const C=(materia,frente,verso)=>({materia,frente,verso});
+const CARDS_BASE=[
+C('Redação Oficial','Quais são os dois fechos previstos no Manual de Redação da Presidência?','Respeitosamente: para autoridade de hierarquia superior.\nAtenciosamente: para mesma hierarquia ou hierarquia inferior.'),
+C('Redação Oficial','O que é o "padrão ofício" na 3ª edição do Manual?','A uniformização de ofício, aviso e memorando, com nomenclatura e diagramação únicas.'),
+C('Redação Oficial','Com pronome de tratamento, em que pessoa ficam o verbo e o possessivo?','Na 3ª pessoa: "Vossa Excelência está…", "sua assessoria".'),
+C('Redação Oficial','Quando usar "Vossa" e quando usar "Sua" Excelência?','Vossa: ao falar diretamente com a autoridade.\nSua: ao falar sobre ela.'),
+C('Poder Legislativo e Processo Legislativo','Quais são as três partes de uma lei pela LC 95/1998?','Preliminar (epígrafe, ementa, preâmbulo, objeto e âmbito), normativa (conteúdo) e final (implementação, transitórias, vigência e revogação).'),
+C('Poder Legislativo e Processo Legislativo','LC 95/1998: como se conta o prazo de vacância?','Inclui a data da publicação e o último dia do prazo. A lei entra em vigor no dia seguinte à consumação integral (art. 8º, § 1º).'),
+C('Poder Legislativo e Processo Legislativo','LC 95/1998: como se numeram incisos, alíneas e itens?','Incisos: romanos (I, II). Alíneas: letras minúsculas (a, b). Itens: arábicos (1, 2).'),
+C('Poder Legislativo e Processo Legislativo','LC 95/1998: até qual artigo a numeração é ordinal?','Até o nono (Art. 9º). A partir do décimo é cardinal (Art. 10).'),
+C('Poder Legislativo e Processo Legislativo','Como é votada a Lei Orgânica municipal (CF, art. 29)?','Em dois turnos, com interstício mínimo de 10 dias, aprovada por 2/3 dos membros da Câmara, que a promulga.'),
+C('Poder Legislativo e Processo Legislativo','Que quórum afasta o parecer prévio do Tribunal de Contas sobre as contas do Prefeito?','Dois terços dos membros da Câmara Municipal (CF, art. 31, § 2º).'),
+C('Poder Legislativo e Processo Legislativo','Qual é o alcance da inviolabilidade do Vereador?','Opiniões, palavras e votos no exercício do mandato e na circunscrição do Município (CF, art. 29, VIII).'),
+C('Poder Legislativo e Processo Legislativo','O que diz o art. 66, § 2º, da CF sobre o veto parcial?','Abrange texto integral de artigo, parágrafo, inciso ou alínea. Não se vetam palavras isoladas.'),
+C('Legislação Municipal','Quais espécies compõem o processo legislativo de Cuiabá (LO, art. 23)?','Emendas à Lei Orgânica, leis complementares, leis ordinárias, resoluções e decretos legislativos.'),
+C('Legislação Municipal','Qual é a duração do estágio probatório na Câmara de Cuiabá?','3 anos (LC 93/2003, art. 28; item 16.8 do edital).'),
+C('Legislação Municipal','Qual é a jornada dos cargos do concurso da CMC?','30 horas semanais (LC 235/2011, art. 36).'),
+C('Direito Administrativo e Constitucional','Quais são os princípios do art. 37 da CF?','LIMPE: Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência.'),
+C('Direito Administrativo e Constitucional','Quais são os 5 requisitos do ato administrativo?','Competência, Finalidade, Forma, Motivo e Objeto (mnemônico: "COFIFOMOB").'),
+C('Direito Administrativo e Constitucional','Quais são os atributos do ato administrativo?','Presunção de legitimidade, imperatividade, autoexecutoriedade e tipicidade (mnemônico: "PATI").'),
+C('Direito Administrativo e Constitucional','Qual é a validade de um concurso público (CF, art. 37, III)?','Até 2 anos, prorrogável uma vez por igual período.'),
+C('Direito Administrativo e Constitucional','Quando o servidor efetivo adquire estabilidade?','Após 3 anos de efetivo exercício e aprovação em avaliação especial de desempenho (CF, art. 41).'),
+C('Direito Administrativo e Constitucional','Responsabilidade civil do Estado (CF, art. 37, § 6º): qual é a regra?','Responsabilidade objetiva da pessoa jurídica, com regresso contra o agente em caso de dolo ou culpa.'),
+C('Direito Administrativo e Constitucional','Quais são as hipóteses de acumulação lícita de cargos?','Dois de professor; um de professor com outro técnico ou científico; dois de profissionais de saúde regulamentados. Sempre com compatibilidade de horários.'),
+C('Arquivologia e Atendimento','Quais são as três idades dos arquivos?','Corrente (uso frequente), intermediário (uso eventual, aguardando destinação) e permanente (valor histórico, guarda definitiva).'),
+C('Arquivologia e Atendimento','Quais são as atividades do protocolo?','Recebimento, classificação, registro, distribuição, controle da tramitação e expedição.'),
+C('Contabilidade Pública','Quais são os estágios da despesa pública (Lei 4.320/1964)?','Fixação, empenho, liquidação e pagamento. Não há despesa sem prévio empenho (art. 60).'),
+C('Contabilidade Pública','Quais são os estágios da receita pública?','Previsão, lançamento, arrecadação e recolhimento.'),
+C('Contabilidade Pública','O que diz o princípio da exclusividade orçamentária?','A LOA não terá dispositivo estranho à previsão da receita e à fixação da despesa (CF, art. 165, § 8º).'),
+C('Contabilidade Pública','Quais são os instrumentos de planejamento orçamentário?','PPA (plano plurianual), LDO (diretrizes orçamentárias) e LOA (orçamento anual).'),
+C('Segurança do Trabalho e Fotografia','Quais são as cores do mapa de riscos?','Verde: físico. Vermelho: químico. Marrom: biológico. Amarelo: ergonômico. Azul: acidentes.'),
+C('Noções de Informática','O que é phishing?','Fraude que imita comunicações legítimas para induzir a vítima a entregar senhas ou dados.'),
+C('Noções de Informática','O que é dado pessoal sensível na LGPD?','Origem racial ou étnica, religião, opinião política, filiação sindical ou a organização religiosa, filosófica ou política, saúde, vida sexual, dado genético ou biométrico.'),
+C('Raciocínio Lógico e Matemático','Qual é a negação de "Todo A é B"?','"Algum A não é B".'),
+C('Raciocínio Lógico e Matemático','Qual é a negação de "Se p, então q"?','"p e não q".'),
+C('Raciocínio Lógico e Matemático','Qual é a negação de "p e q" e de "p ou q"?','~(p ∧ q) = ~p ∨ ~q\n~(p ∨ q) = ~p ∧ ~q (leis de De Morgan).'),
+C('Língua Portuguesa','"Fazer" e "haver" impessoais: como se conjugam?','Na 3ª pessoa do singular: "Faz dois anos", "Houve sessões", "Havia vereadores".'),
+C('História e Geografia de MT','Quem fundou Cuiabá e quando?','A bandeira de Pascoal Moreira Cabral, em 1719. Elevada a vila em 1727 por Rodrigo César de Menezes.'),
+C('História e Geografia de MT','O que foi a Rusga?','Levante nativista contra portugueses em Cuiabá, em 30 de maio de 1834, no período regencial.'),
+C('História e Geografia de MT','Quando a capital passou de Vila Bela para Cuiabá?','Em 1835.'),
+C('História e Geografia de MT','Quando foi criado Mato Grosso do Sul?','Pela LC nº 31, de 11/10/1977. Instalado em 1º/01/1979.'),
+C('Poder Legislativo e Processo Legislativo','Qual é o limite de gasto da Câmara com folha de pagamento?','70% da sua receita, incluído o subsídio dos Vereadores (CF, art. 29-A, § 1º).'),
+C('Poder Legislativo e Processo Legislativo','LC 95/1998: como inserir artigo novo sem renumerar?','Com o número do artigo anterior seguido de letra maiúscula (Art. 5º-A). O artigo alterado recebe "(NR)" ao final.'),
+C('Direito Administrativo e Constitucional','O que diz a Súmula 525 do STJ?','A Câmara de Vereadores não tem personalidade jurídica, apenas personalidade judiciária, e só demanda em juízo para defender seus direitos institucionais.'),
+C('Direito Administrativo e Constitucional','Qual é a diferença entre anulação e revogação?','Anulação: ato ilegal, efeitos ex tunc, pela Administração ou pelo Judiciário.\nRevogação: conveniência e oportunidade, efeitos ex nunc, só pela Administração (Súmula 473/STF).'),
+C('Redação Oficial','Ata: como corrigir um erro durante a escrita e uma omissão notada depois?','Durante a escrita: "digo", seguido da forma correta. Depois de lavrada: "em tempo", ao final da ata.'),
+C('Arquivologia e Atendimento','O que é o princípio da proveniência?','Os documentos de uma entidade produtora ficam juntos, sem se misturar aos de outras (respeito aos fundos).'),
+C('Contabilidade Pública','Quais são os tipos de créditos adicionais?','Suplementares (reforçam dotação), especiais (sem dotação específica) e extraordinários (despesas urgentes e imprevisíveis). Lei 4.320/1964, art. 41.'),
+C('Contabilidade Pública','O que são restos a pagar?','Despesas empenhadas e não pagas até 31/12. Podem ser processadas (já liquidadas) ou não processadas (Lei 4.320/1964, art. 36).'),
+C('Ética e Filosofia','Qual é a diferença entre juízo de fato e juízo de valor?','O juízo de fato descreve o que é e pode ser verificado. O juízo de valor avalia o que é bom, belo ou devido.')
+];
+
+/* ============ Estado ============ */
+function estadoInicial(){
+  const t=hoje();
+  return {versao:1,atualizado:0,metaHoras:15,plano:JSON.parse(JSON.stringify(PLANO_PADRAO)),sessoes:[],
+    cards:CARDS_BASE.map((c,i)=>({id:'cb'+i,materia:c.materia,frente:c.frente,verso:c.verso,caixa:1,revisao:t,origem:'base'})),
+    questoesGeradas:[],respostas:{},historico:[],redacoes:[],baseCardsV:2,pomo:{foco:25,curta:5,longa:15,ciclos:4,auto:false,som:true}};
+}
+let S=estadoInicial();
+let DB=null, USERID=null, SAMPLE=null, docRef=null, modoSalvar='local';
+const LKEY='aprova-legislativo-v1';
+function lerLocal(){try{const r=localStorage.getItem(LKEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function gravarLocal(){try{localStorage.setItem(LKEY,JSON.stringify(S));return true;}catch(e){return false;}}
+function saneia(x){
+  const b=estadoInicial(); if(!x||typeof x!=='object') return b;
+  const o=Object.assign(b,x);
+  if(!o.plano||!Array.isArray(o.plano.materias)||!o.plano.materias.length) o.plano=b.plano;
+  ['sessoes','cards','questoesGeradas','historico','redacoes'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[];});
+  if(!o.respostas||typeof o.respostas!=='object') o.respostas={};
+  o.pomo=Object.assign({foco:25,curta:5,longa:15,ciclos:4,auto:false,som:true},o.pomo||{});
+  if((o.baseCardsV||1)<2){const tem=new Set(o.cards.map(c=>c.frente));const t=hoje();
+    CARDS_BASE.forEach((c,i)=>{if(!tem.has(c.frente))o.cards.push({id:'cb2_'+i,materia:c.materia,frente:c.frente,verso:c.verso,caixa:1,revisao:t,origem:'base'});});
+    o.baseCardsV=2;}
+  return o;
+}
+let salvando=false, pendente=false, tSalvar=null;
+function salvar(){
+  S.atualizado=Date.now();
+  gravarLocal();
+  clearTimeout(tSalvar); tSalvar=setTimeout(enviar,900);
+  marcarSalvar('pend');
+}
+async function enviar(){
+  if(!docRef){marcarSalvar();return;}
+  if(salvando){pendente=true;return;}
+  salvando=true;
+  try{ await docRef.set(JSON.parse(JSON.stringify(S))); marcarSalvar(); }
+  catch(e){
+    if(e&&e.code==='quota_exceeded'){toast('Seu espaço de dados está cheio. Exclua cards ou questões geradas antigas.');}
+    else if(e&&e.code==='invalid_argument'){docRef=null;modoSalvar='local';}
+    marcarSalvar('erro');
+  }
+  salvando=false;
+  if(pendente){pendente=false;enviar();}
+}
+function marcarSalvar(st){
+  const c=$('#chip-save');
+  if(st==='pend'){c.textContent='Salvando…';return;}
+  if(st==='erro'){c.textContent='Salvo só neste navegador';return;}
+  c.textContent=docRef?'Progresso salvo na sua conta':'Salvo só neste navegador';
+}
+
+/* ============ Plano / matérias ============ */
+const materias=()=>S.plano.materias;
+const materiaPorNome=n=>materias().find(m=>m.nome===n);
+const pesoDe=n=>{const m=materiaPorNome(n);if(m)return m.peso||1;const b=PLANO_PADRAO.materias.find(x=>x.nome===n);return b?b.peso:1;};
+const areaDe=n=>{const m=materiaPorNome(n)||PLANO_PADRAO.materias.find(x=>x.nome===n);return m?m.area:'Outras';};
+function opcoesMaterias(sel,{todas=false,valor}={}){
+  const ms=materias();
+  const areas=[...new Set(ms.map(m=>m.area))];
+  let h=todas?'<option value="">Todas as matérias</option>':'';
+  areas.forEach(a=>{h+='<optgroup label="'+esc(a)+'">'+ms.filter(m=>m.area===a).map(m=>'<option'+(m.nome===valor?' selected':'')+'>'+esc(m.nome)+'</option>').join('')+'</optgroup>';});
+  sel.innerHTML=h;
+}
+
+/* ============ Roteamento ============ */
+const VIEWS=['inicio','edital','flashcards','discursiva','quiz'];
+function rota(){
+  const h=(location.hash||'').replace('#','');
+  const v=VIEWS.includes(h)?h:'inicio';
+  VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);});
+  document.querySelectorAll('nav.tabs a').forEach(a=>{if(a.dataset.v===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  ({inicio:renderInicio,edital:renderEdital,flashcards:renderFlash,discursiva:renderDisc,quiz:renderQuiz})[v]();
+}
+window.addEventListener('hashchange',rota);
+
+/* ============ Início ============ */
+function minutosPorDia(ini){const arr=[0,0,0,0,0,0,0];S.sessoes.forEach(s=>{const d=Math.round((parseIso(s.data)-parseIso(ini))/864e5);if(d>=0&&d<7)arr[d]+=s.minutos;});return arr;}
+function sequencia(){const dias=new Set(S.sessoes.map(s=>s.data));let d=hoje(),n=0;if(!dias.has(d))d=addDias(d,-1);while(dias.has(d)){n++;d=addDias(d,-1);}return n;}
+function renderInicio(){
+  const ini=inicioSemana(hoje()), fim=addDias(ini,6);
+  const fmt=s=>{const d=parseIso(s);return z(d.getDate())+'/'+z(d.getMonth()+1);};
+  $('#semana-label').textContent='Semana de '+fmt(ini)+' a '+fmt(fim);
+  $('#meta').value=S.metaHoras;
+  const porDia=minutosPorDia(ini), totalMin=porDia.reduce((a,b)=>a+b,0);
+  const metaMin=S.metaHoras*60, pct=Math.min(100,Math.round(totalMin/metaMin*100)||0);
+  const resp=Object.values(S.respostas); const ac=resp.reduce((a,r)=>a+r.acertos,0), tot=resp.reduce((a,r)=>a+r.acertos+r.erros,0);
+  const due=S.cards.filter(c=>c.revisao<=hoje()).length;
+  const seq=sequencia();
+  $('#kpis').innerHTML=
+   kpi('Horas na semana',fmtDec(totalMin/60)+' h','de '+S.metaHoras+' h da meta ('+pct+'%)',pct)+
+   kpi('Pomodoros hoje',String(pomosHoje()),seq?seq+(seq===1?' dia seguido':' dias seguidos')+' de estudo':'Faça o primeiro foco de hoje')+
+   kpi('Acerto no quiz',tot?Math.round(ac/tot*100)+'%':'–',tot?ac+' de '+tot+' questões':'Nenhuma questão respondida')+
+   kpi('Cards para hoje',String(due),S.cards.length+' cards no total');
+  $('#chart-total').textContent='Total: '+fmtH(totalMin);
+  $('#chart').innerHTML=grafico(porDia,metaMin/7,ini);
+  // por matéria
+  const mm={}; S.sessoes.forEach(s=>{if(s.data>=ini&&s.data<=fim)mm[s.materia]=(mm[s.materia]||0)+s.minutos;});
+  const ent=Object.entries(mm).sort((a,b)=>b[1]-a[1]); const mx=ent.length?ent[0][1]:1;
+  $('#por-materia').innerHTML=ent.length?ent.map(([n,m])=>'<div class="hbar"><span>'+esc(n)+(pesoDe(n)>1?' <span class="tag esp">peso 1,75</span>':'')+'</span><b class="num">'+fmtH(m)+'</b><div class="track"><i style="width:'+Math.max(3,m/mx*100)+'%"></i></div></div>').join(''):'<div class="empty">Nenhum estudo registrado nesta semana. Use o cronômetro ou registre uma sessão.</div>';
+  // sessoes
+  const ult=[...S.sessoes].sort((a,b)=>b.data.localeCompare(a.data)||b.criado-a.criado).slice(0,6);
+  $('#sessoes').innerHTML=ult.length?ult.map(s=>'<li><span class="grow">'+esc(s.materia)+'<br><span class="muted small num">'+fmt(s.data)+' · '+fmtH(s.minutos)+'</span></span><button class="btn ghost sm danger" data-del="'+s.id+'" aria-label="Excluir sessão">Excluir</button></li>').join(''):'<li class="muted">Sem sessões ainda.</li>';
+  opcoesMaterias($('#timer-mat'),{valor:$('#timer-mat').value||materias()[0].nome});
+  opcoesMaterias($('#m-mat'),{valor:$('#m-mat').value});
+  if(!$('#m-data').value)$('#m-data').value=hoje();
+}
+function kpi(l,v,s,bar){return '<div class="card kpi"><div class="lbl">'+l+'</div><div class="val num">'+v+'</div><div class="sub">'+s+'</div>'+(bar!=null?'<div class="bar"><i style="width:'+bar+'%"></i></div>':'')+'</div>';}
+function grafico(porDia,metaDia,ini){
+  const W=620,H=250,L=40,R=12,T=18,B=34, w=W-L-R, h=H-T-B;
+  const horas=porDia.map(m=>m/60), mh=metaDia/60;
+  let top=Math.max(1,...horas,mh); const step=top<=2?0.5:top<=5?1:top<=10?2:4; top=Math.ceil(top/step)*step;
+  const y=v=>T+h-(v/top)*h, bw=w/7*0.56;
+  let g='';
+  for(let v=0;v<=top+1e-9;v+=step){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end">'+fmtDec(v)+'h</text>';}
+  const hj=hoje();
+  horas.forEach((v,i)=>{const cx=L+w/7*(i+0.5), dia=addDias(ini,i), isH=dia===hj;
+    const bh=Math.max(v>0?3:0,(v/top)*h);
+    g+='<rect x="'+(cx-bw/2)+'" y="'+(T+h-bh)+'" width="'+bw+'" height="'+bh+'" rx="5" fill="var(--accent)" opacity="'+(dia>hj?0.35:1)+'"><title>'+DIAS[i]+': '+fmtH(porDia[i])+'</title></rect>';
+    if(v>0)g+='<text x="'+cx+'" y="'+(T+h-bh-6)+'" text-anchor="middle" style="fill:var(--ink);font-weight:600">'+fmtDec(v)+'</text>';
+    g+='<text x="'+cx+'" y="'+(H-12)+'" text-anchor="middle" style="'+(isH?'fill:var(--accent);font-weight:700':'')+'">'+DIAS[i]+'</text>';
+  });
+  g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(mh)+'" y2="'+y(mh)+'" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 5"/>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Horas estudadas por dia da semana">'+g+'</svg>';
+}
+$('#meta').addEventListener('change',e=>{const v=Math.max(1,Math.min(80,parseInt(e.target.value)||15));S.metaHoras=v;salvar();renderInicio();});
+$('#f-manual').addEventListener('submit',e=>{e.preventDefault();const m=parseInt($('#m-min').value);if(!m||m<1){toast('Informe os minutos estudados.');return;}
+  addSessao($('#m-mat').value,m,$('#m-data').value||hoje());toast('Sessão de '+fmtH(m)+' registrada.');});
+$('#sessoes').addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;
+  if(await confirmar('Excluir sessão','A sessão sai do gráfico e do total da semana.')){S.sessoes=S.sessoes.filter(s=>s.id!==id);salvar();renderInicio();}});
+function addSessao(materia,minutos,data,pomodoro){S.sessoes.push(Object.assign({id:uid(),materia,minutos:Math.round(minutos),data,criado:Date.now()},pomodoro?{pomodoro:1}:{}));if(S.sessoes.length>3000)S.sessoes=S.sessoes.slice(-3000);salvar();renderInicio();}
+
+/* Pomodoro */
+const PKEY='aprova-pomo-v1';
+const P={fase:'foco',rodando:false,fim:0,restante:null,ciclo:0,iv:null,ctx:null};
+const FASE_NOME={foco:'Foco',curta:'Pausa curta',longa:'Pausa longa'};
+const durFase=f=>(S.pomo[f]||25)*60000;
+function pomosHoje(){return S.sessoes.filter(x=>x.pomodoro&&x.data===hoje()).length;}
+function restanteMs(){return P.rodando?Math.max(0,P.fim-Date.now()):(P.restante==null?durFase(P.fase):P.restante);}
+function guardaP(){try{localStorage.setItem(PKEY,JSON.stringify({fase:P.fase,rodando:P.rodando,fim:P.fim,restante:P.restante,ciclo:P.ciclo,mat:$('#timer-mat').value}));}catch(e){}}
+function pintaPomo(){
+  const r=restanteMs(), tot=durFase(P.fase), sec=Math.ceil(r/1000);
+  $('#pomo-t').textContent=z(Math.floor(sec/60))+':'+z(sec%60);
+  $('#pomo-f').textContent=FASE_NOME[P.fase]+(P.rodando?'':(P.restante!=null&&P.restante<tot?' · pausado':''));
+  const arc=$('#pomo-arc'); arc.setAttribute('stroke-dashoffset',String(326.7*(1-r/tot)));
+  arc.setAttribute('stroke',P.fase==='foco'?'var(--accent)':'var(--good)');
+  document.querySelectorAll('.fase').forEach(b=>{b.classList.toggle('on',b.dataset.fase===P.fase);b.classList.toggle('pausa',b.dataset.fase!=='foco');});
+  $('#p-go').textContent=P.rodando?'Pausar':(P.restante!=null&&P.restante<tot?'Continuar':(P.fase==='foco'?'Iniciar foco':'Iniciar pausa'));
+  $('#p-parcial').disabled=!(P.fase==='foco'&&(tot-r)>=60000);
+  const n=S.pomo.ciclos; $('#pomo-dots').innerHTML=Array.from({length:n},(_,i)=>'<i class="'+(i<P.ciclo%n||(P.ciclo>0&&P.ciclo%n===0&&P.fase==='longa')?'feito':'')+'"></i>').join('');
+  $('#pomo-hoje').textContent=pomosHoje()+' hoje';
+  if(P.rodando)document.title=$('#pomo-t').textContent+' · '+FASE_NOME[P.fase]+' – Aprova Legislativo';else document.title='Aprova Legislativo';
+}
+function bip(){if(!S.pomo.som||!P.ctx)return;try{const c=P.ctx;[0,0.35,0.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(0.0001,c.currentTime+t);g.gain.exponentialRampToValueAtTime(0.25,c.currentTime+t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+t+0.25);o.start(c.currentTime+t);o.stop(c.currentTime+t+0.3);});}catch(e){}}
+function iniciaP(){P.fim=Date.now()+restanteMs();P.rodando=true;P.restante=null;clearInterval(P.iv);P.iv=setInterval(tickP,500);guardaP();pintaPomo();}
+function pausaP(){P.restante=restanteMs();P.rodando=false;clearInterval(P.iv);guardaP();pintaPomo();}
+function irPara(f){P.fase=f;P.rodando=false;P.restante=null;clearInterval(P.iv);guardaP();pintaPomo();}
+function concluiFase(silencioso){
+  clearInterval(P.iv);P.rodando=false;P.restante=null;
+  if(P.fase==='foco'){
+    const mat=$('#timer-mat').value||materias()[0].nome;
+    addSessao(mat,S.pomo.foco,hoje(),true); P.ciclo++;
+    const longa=P.ciclo%S.pomo.ciclos===0; P.fase=longa?'longa':'curta';
+    if(!silencioso)toast('Foco concluído: '+S.pomo.foco+' min de '+mat+'. Hora da '+(longa?'pausa longa':'pausa curta')+'.');
+  } else { P.fase='foco'; if(!silencioso)toast('Pausa encerrada. Pronto para o próximo foco?'); }
+  if(!silencioso)bip();
+  guardaP(); pintaPomo();
+  if(S.pomo.auto&&!silencioso)iniciaP();
+}
+function tickP(){if(P.rodando&&Date.now()>=P.fim)concluiFase(false);else pintaPomo();}
+$('#p-go').onclick=()=>{
+  if(!P.ctx){try{const AC=window.AudioContext||window.webkitAudioContext;if(AC)P.ctx=new AC();}catch(e){}}
+  if(P.ctx&&P.ctx.state==='suspended'){P.ctx.resume().catch(()=>{});}
+  if(P.rodando)pausaP();else iniciaP();
+};
+$('#p-skip').onclick=()=>{const prox=P.fase==='foco'?((P.ciclo+1)%S.pomo.ciclos===0?'longa':'curta'):'foco';if(P.fase==='foco')P.ciclo++;irPara(prox);toast('Etapa pulada. Foco pulado não é salvo.');};
+$('#p-parcial').onclick=()=>{const feito=(durFase('foco')-restanteMs())/60000;if(P.fase!=='foco'||feito<1)return;
+  addSessao($('#timer-mat').value,feito,hoje(),false);toast('Foco parcial de '+fmtH(feito)+' salvo.');irPara('foco');};
+document.querySelectorAll('.fase').forEach(b=>b.onclick=()=>{if(P.rodando&&!confirm_ok())return;irPara(b.dataset.fase);});
+function confirm_ok(){toast('Pause o pomodoro antes de trocar de etapa.');return false;}
+$('#timer-mat').addEventListener('change',guardaP);
+function pintaCfg(){$('#c-foco').value=S.pomo.foco;$('#c-curta').value=S.pomo.curta;$('#c-longa').value=S.pomo.longa;$('#c-ciclos').value=S.pomo.ciclos;$('#c-auto').checked=!!S.pomo.auto;$('#c-som').checked=S.pomo.som!==false;}
+[['c-foco','foco',5,90],['c-curta','curta',1,30],['c-longa','longa',5,60],['c-ciclos','ciclos',2,8]].forEach(([id,k,mn,mx])=>$('#'+id).addEventListener('change',e=>{
+  const v=Math.max(mn,Math.min(mx,parseInt(e.target.value)||S.pomo[k]));S.pomo[k]=v;e.target.value=v;salvar();pintaPomo();}));
+$('#c-auto').addEventListener('change',e=>{S.pomo.auto=e.target.checked;salvar();});
+$('#c-som').addEventListener('change',e=>{S.pomo.som=e.target.checked;salvar();});
+function restauraP(){
+  let r=null;try{r=JSON.parse(localStorage.getItem(PKEY)||'null');}catch(e){}
+  if(r&&FASE_NOME[r.fase]){P.fase=r.fase;P.ciclo=r.ciclo||0;P.restante=r.restante;
+    if(r.mat)setTimeout(()=>{const sel=$('#timer-mat');if([...sel.options].some(o=>o.value===r.mat))sel.value=r.mat;},0);
+    if(r.rodando){if(Date.now()>=r.fim){setTimeout(()=>{concluiFase(true);toast('Uma etapa do pomodoro terminou enquanto o app estava fechado.');},50);}
+      else{P.fim=r.fim;P.rodando=true;P.restante=null;P.iv=setInterval(tickP,500);}}}
+  pintaCfg(); pintaPomo();
+}
+
+/* ============ Edital ============ */
+let extraido=null; // {materias:[{nome,area,topicos,incluir}], texto, paginas}
+function renderEdital(){
+  const p=S.plano;
+  $('#plano-fonte').textContent=p.cargo+(p.orgao?' · '+p.orgao:'')+' — '+(p.fonte||'');
+  const areas=[...new Set(p.materias.map(m=>m.area))];
+  $('#plano').innerHTML=areas.map(a=>{const ms=p.materias.filter(m=>m.area===a);
+    return '<div class="area-block"><h3>'+esc(a)+(ms[0]&&ms[0].peso>1?' <span class="tag esp">peso '+String(ms[0].peso).replace('.',',')+'</span>':'')+'</h3>'+
+    ms.map(m=>'<details class="mat"><summary>'+esc(m.nome)+'<span class="muted small cnt num">'+m.topicos.length+' tópicos</span></summary><ol>'+m.topicos.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ol></details>').join('')+'</div>';}).join('');
+  $('#estrutura').style.display=p.fonte&&p.fonte.indexOf('001/2026-CMC')>=0?'':'none';
+  renderExtraido();
+}
+$('#restaurar').onclick=async()=>{if(await confirmar('Restaurar plano padrão','O plano volta às matérias do Técnico Legislativo do edital CMC 2026. Suas sessões, cards e questões continuam salvos.')){S.plano=JSON.parse(JSON.stringify(PLANO_PADRAO));salvar();atualizaSub();renderEdital();toast('Plano restaurado.');}};
+const drop=$('#drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)lerPDF(f);});
+drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#pdf').click();}});
+drop.tabIndex=0;
+$('#pdf').addEventListener('change',e=>{const f=e.target.files[0];if(f)lerPDF(f);e.target.value='';});
+
+let pdfjsPronto=null;
+function carregaScript(src){return new Promise((ok,er)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>er(new Error('falha ao carregar '+src));document.head.appendChild(s);});}
+function carregaPdfjs(){
+  if(!pdfjsPronto){const base='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+    pdfjsPronto=carregaScript(base+'pdf.min.js').then(()=>carregaScript(base+'pdf.worker.min.js')).then(()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js';return window.pdfjsLib;});}
+  return pdfjsPronto;
+}
+async function lerPDF(file){
+  const st=$('#pdf-status');
+  if(!/pdf$/i.test(file.name)&&file.type!=='application/pdf'){st.innerHTML='<div class="notice err">Escolha um arquivo PDF.</div>';return;}
+  st.innerHTML='<span class="spin"></span> Carregando leitor de PDF…';
+  try{
+    const lib=await carregaPdfjs();
+    const buf=await file.arrayBuffer();
+    const doc=await lib.getDocument({data:buf,disableWorker:true,isEvalSupported:false}).promise;
+    const paginas=[];
+    for(let i=1;i<=doc.numPages;i++){
+      st.innerHTML='<span class="spin"></span> Lendo página '+i+' de '+doc.numPages+'…';
+      const pg=await doc.getPage(i); const tc=await pg.getTextContent();
+      paginas.push(linhasDaPagina(tc.items));
+    }
+    const res=extrairMaterias(paginas,$('#cargo').value);
+    extraido={materias:res.materias.map(m=>Object.assign(m,{incluir:true})),secao:res.secao,arquivo:file.name,paginas:doc.numPages};
+    st.innerHTML=res.materias.length?('<b>'+esc(file.name)+'</b>: '+doc.numPages+' páginas lidas, '+res.materias.length+' matérias encontradas'+(res.cargoAchado?' para "'+esc($('#cargo').value)+'"':'')+'. Revise abaixo antes de salvar.')
+      :'<div class="notice err">Não encontrei matérias no formato esperado. Tente a extração com Claude ou confira se o PDF tem texto selecionável (PDFs escaneados não funcionam).</div>';
+    renderExtraido();
+  }catch(e){st.innerHTML='<div class="notice err">Não foi possível ler o PDF ('+esc(e.message||e)+'). Verifique se o arquivo não está protegido por senha.</div>';}
+}
+function linhasDaPagina(items){
+  const ls=[];
+  items.forEach(it=>{if(!it.str)return;const y=Math.round(it.transform[5]),x=it.transform[4];
+    let l=ls.find(q=>Math.abs(q.y-y)<=3);if(!l){l={y,parts:[]};ls.push(l);}l.parts.push({x,s:it.str});});
+  ls.sort((a,b)=>b.y-a.y);
+  return ls.map(l=>l.parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+}
+/* Função pura: recebe páginas (arrays de linhas) e devolve matérias */
+function extrairMaterias(paginas,cargo){
+  const freq={}; paginas.forEach(p=>new Set(p).forEach(l=>{freq[l]=(freq[l]||0)+1;}));
+  const lim=Math.max(3,paginas.length*0.3);
+  let linhas=[]; paginas.forEach(p=>p.forEach(l=>{if(freq[l]>=lim)return;if(/^p[áa]gina\s+\d+(\s+de\s+\d+)?$/i.test(l))return;if(/^\d{1,3}$/.test(l))return;linhas.push(l);}));
+  // início do conteúdo programático
+  let ini=-1;
+  for(let i=0;i<linhas.length;i++){if(/conte[úu]do?s?\s+program[áa]tico/i.test(linhas[i])&&linhas[i].length<60){ini=i;break;}}
+  if(ini<0)for(let i=0;i<linhas.length;i++){if(/conte[úu]do?s?\s+program[áa]tico/i.test(linhas[i])){ini=i;}}
+  let sec=ini>=0?linhas.slice(ini+1):linhas;
+  // segmentos por nível/cargo: "A) NÍVEL MÉDIO: ..."
+  const nc=norm(cargo); let cargoAchado=false;
+  const segIdx=[]; sec.forEach((l,i)=>{if(/^[A-H]\)\s+\S/.test(l))segIdx.push(i);});
+  if(nc&&segIdx.length){
+    for(let k=0;k<segIdx.length;k++){const a=segIdx[k],b=k+1<segIdx.length?segIdx[k+1]:sec.length;
+      const cab=norm(sec.slice(a,a+3).join(' '));
+      const pal=nc.replace(/[^a-z0-9 ]/g,' ').split(' ').filter(Boolean);
+      let ok=cab.indexOf(nc)>=0;
+      for(let w=pal.length;!ok&&w>=2;w--){ok=cab.indexOf(pal.slice(0,w).join(' '))>=0;}
+      if(ok){sec=sec.slice(a+1,b);cargoAchado=true;break;}}
+  }
+  const ehArea=l=>/^conhecimentos?\s+\S+/i.test(l)&&l===l.toUpperCase()&&l.length<60;
+  const ehCab=(l,prox)=>{
+    if(l.length<3||l.length>80)return false;
+    if(/^[\d\(\-–•]/.test(l))return false;
+    if(/[.;,:]$/.test(l))return false;
+    if(!/^[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/.test(l))return false;
+    if(!prox)return false;
+    return /^1\s?[\.\)\-–](\s|$)/.test(prox)||/^\S.{0,80}?\s1\.\s[A-ZÁÉÍÓÚÂÊÔÃÕÇ]/.test(prox.slice(0,100));
+  };
+  const mats=[]; let area='Matérias', atual=null;
+  for(let i=0;i<sec.length;i++){
+    const l=sec[i];
+    if(/^[A-H]\)\s+N[ÍI]VEL/i.test(l)&&mats.length)break;
+    if(ehArea(l)){area=l.toLowerCase().split(' ').map(w=>/^(e|de|da|do|das|dos)$/.test(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');atual=null;continue;}
+    if(ehCab(l,sec[i+1])){atual={nome:l,area,texto:''};mats.push(atual);continue;}
+    if(atual)atual.texto+=' '+l;
+  }
+  // filtra específicos pelo cargo
+  let lista=mats;
+  if(nc){const esp=mats.filter(m=>/espec/i.test(m.area));
+    const nn=x=>norm(x).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();const exato=esp.filter(m=>nn(m.nome)===nn(cargo));
+    if(exato.length){lista=mats.filter(m=>!/espec/i.test(m.area)||exato.includes(m));cargoAchado=true;}}
+  const out=lista.map(m=>({nome:m.nome,area:m.area,topicos:quebraTopicos(m.texto)})).filter(m=>m.topicos.length);
+  return {materias:out,cargoAchado,secao:sec.join('\n').slice(0,60000)};
+}
+function quebraTopicos(t){
+  t=t.replace(/\s+/g,' ').trim(); if(!t)return[];
+  const partes=t.split(/(?:^|\s)\d{1,2}\s?[\.\)]\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/).map(s=>s.trim().replace(/[\s;,.]+$/,'')).filter(s=>s.length>2);
+  return partes.slice(0,40);
+}
+function renderExtraido(){
+  const box=$('#extract-box');
+  if(!extraido){box.innerHTML='<div class="row" style="margin-top:4px"><button class="btn" id="ia-ext" '+(SAMPLE&&extraido?'':'disabled')+'>Extrair com Claude</button><span class="muted small">Disponível depois de carregar um PDF.</span></div>';return;}
+  const areas=[...new Set(materias().map(m=>m.area).concat(extraido.materias.map(m=>m.area)))];
+  box.innerHTML='<div class="card-h" style="margin-top:6px"><h3>Matérias encontradas</h3><span class="muted small num">'+extraido.materias.filter(m=>m.incluir).length+' selecionadas</span></div>'+
+   (extraido.materias.length?extraido.materias.map((m,i)=>'<div class="extract-row"><input type="checkbox" id="ex-'+i+'" data-i="'+i+'" '+(m.incluir?'checked':'')+' aria-label="Incluir '+esc(m.nome)+'">'+
+     '<div><input type="text" value="'+esc(m.nome)+'" data-nome="'+i+'" aria-label="Nome da matéria"><div class="muted small num" style="margin-top:3px">'+m.topicos.length+' tópicos: '+esc(m.topicos.slice(0,2).join('; ')).slice(0,120)+'…</div></div>'+
+     '<select data-area="'+i+'" aria-label="Área">'+[m.area].concat(['Conhecimentos Básicos','Conhecimentos Gerais','Conhecimentos Específicos'].filter(x=>x!==m.area)).map(a=>'<option>'+esc(a)+'</option>').join('')+'</select>'+
+     '<span class="tag'+(/espec/i.test(m.area)?' esp':'')+'">'+(/espec/i.test(m.area)?'1,75':'1,00')+'</span></div>').join(''):'')+
+   '<div class="row" style="margin-top:12px"><button class="btn primary" id="ex-salvar" '+(extraido.materias.some(m=>m.incluir)?'':'disabled')+'>Usar como meu plano</button>'+
+   '<button class="btn" id="ia-ext" '+(SAMPLE?'':'disabled title="Indisponível nesta visualização"')+'>Extrair com Claude (mais preciso)</button></div>'+
+   '<p class="muted small" id="ia-ext-st" aria-live="polite"></p>';
+}
+$('#extract-box').addEventListener('change',e=>{if(!extraido)return;const t=e.target;
+  if(t.dataset.i!=null){extraido.materias[+t.dataset.i].incluir=t.checked;renderExtraido();}
+  if(t.dataset.nome!=null){extraido.materias[+t.dataset.nome].nome=t.value.trim()||extraido.materias[+t.dataset.nome].nome;}
+  if(t.dataset.area!=null){extraido.materias[+t.dataset.area].area=t.value;renderExtraido();}});
+$('#extract-box').addEventListener('click',async e=>{
+  if(e.target.id==='ex-salvar'){const sel=extraido.materias.filter(m=>m.incluir);
+    if(!(await confirmar('Usar estas matérias','O plano passa a ter '+sel.length+' matérias extraídas de '+extraido.arquivo+'. Sessões, cards e questões já salvos continuam.')))return;
+    S.plano={cargo:$('#cargo').value.trim()||'Cargo',orgao:'',banca:'',fonte:'Importado de '+extraido.arquivo,
+      materias:sel.map(m=>({nome:m.nome,area:m.area,peso:/espec/i.test(m.area)?1.75:1,topicos:m.topicos}))};
+    salvar();atualizaSub();extraido=null;$('#pdf-status').textContent='';renderEdital();toast('Plano atualizado.');}
+  if(e.target.id==='ia-ext')extrairComClaude();
+});
+async function extrairComClaude(){
+  if(!extraido)return; const st=$('#ia-ext-st'); st.innerHTML='<span class="spin"></span> Claude está lendo o conteúdo programático…';
+  const prompt='Você recebe o texto do conteúdo programático de um edital de concurso público brasileiro, extraído de PDF (pode haver quebras de linha e cabeçalhos soltos).\n'+
+   'Cargo de interesse: "'+$('#cargo').value+'".\n'+
+   'Tarefa: liste SOMENTE as matérias cobradas para esse cargo, com a área (por exemplo "Conhecimentos Básicos", "Conhecimentos Gerais", "Conhecimentos Específicos") e os tópicos de cada matéria, fiéis ao texto (não invente tópicos). Ignore matérias específicas de outros cargos.\n'+
+   'Responda apenas com JSON no formato {"materias":[{"nome":"...","area":"...","topicos":["...","..."]}]}.\n\nTEXTO:\n'+extraido.secao.slice(0,45000);
+  try{
+    const r=await pedirJSON(prompt);
+    const ms=(r&&Array.isArray(r.materias)?r.materias:[]).filter(m=>m&&m.nome&&Array.isArray(m.topicos)).map(m=>({nome:String(m.nome).slice(0,90),area:String(m.area||'Matérias').slice(0,60),topicos:m.topicos.map(String).filter(Boolean).slice(0,40),incluir:true}));
+    if(!ms.length)throw {message:'nenhuma matéria na resposta'};
+    extraido.materias=ms;renderExtraido();$('#ia-ext-st').textContent='Claude encontrou '+ms.length+' matérias. Revise e salve.';
+  }catch(e){st.textContent=msgErroIA(e);}
+}
+function atualizaSub(){const p=S.plano;$('#plan-sub').textContent=[p.cargo,p.orgao,p.banca].filter(Boolean).join(' · ');}
+
+/* ============ Claude (sample) ============ */
+async function pedirJSON(prompt){
+  if(!SAMPLE)throw {code:'indisponivel'};
+  if(typeof SAMPLE.json==='function'){const v=await SAMPLE.json(prompt,{modelTier:'default'});return (v&&typeof v==='object'&&'value' in v&&Object.keys(v).length<=2)?v.value:v;}
+  const r=await SAMPLE(prompt,{modelTier:'default'});return jsonSolto(r.text);
+}
+function jsonSolto(t){t=String(t||'');const a=t.search(/[\[{]/);if(a<0)throw {message:'resposta sem JSON'};const b=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));return JSON.parse(t.slice(a,b+1));}
+function msgErroIA(e){if(!e)return 'Falha na geração.';if(e.code==='indisponivel'||e.code==='not_granted')return 'A geração com Claude não está disponível nesta visualização. Use o conteúdo incluído no app.';
+  if(e.code==='rate_limited')return 'Muitas solicitações em pouco tempo. Aguarde um minuto e tente de novo.';return 'Não foi possível gerar agora ('+(e.message||e.code||'erro')+'). Tente novamente.';}
+
+/* ============ Flashcards ============ */
+let fcFila=[], fcAtual=null, fcVirado=false, fcFiltroKey='';
+function renderFlash(){
+  const mats=[...new Set(materias().map(m=>m.nome).concat(S.cards.map(c=>c.materia)))];
+  const fsel=$('#fc-mat'), v=fsel.value;
+  fsel.innerHTML='<option value="">Todas as matérias</option>'+mats.map(n=>'<option'+(n===v?' selected':'')+'>'+esc(n)+'</option>').join('');
+  opcoesMaterias($('#g-mat'),{valor:$('#g-mat').value});
+  opcoesMaterias($('#c-mat'),{valor:$('#c-mat').value});
+  preencheTopicos();
+  $('#g-go').disabled=!SAMPLE; $('#fc-ia-tag').textContent=SAMPLE?'Claude':'Claude indisponível';
+  const cx=[1,2,3,4,5].map(n=>S.cards.filter(c=>c.caixa===n).length);
+  $('#boxes').innerHTML=cx.map((n,i)=>'<div><b class="num">'+n+'</b><span>Caixa '+(i+1)+'<br>'+(i?INTERVALOS[i]+' d':'hoje')+'</span></div>').join('');
+  $('#fc-total').textContent=S.cards.length+' cards';
+  montaFila(false);
+}
+function preencheTopicos(){const m=materiaPorNome($('#g-mat').value);const t=$('#g-top');const v=t.value;
+  t.innerHTML='<option value="">Toda a matéria</option>'+(m?m.topicos.map(x=>'<option'+(x===v?' selected':'')+'>'+esc(x.length>90?x.slice(0,88)+'…':x)+'</option>').join(''):'');}
+$('#g-mat').addEventListener('change',preencheTopicos);
+$('#fc-mat').addEventListener('change',()=>montaFila(true));
+$('#fc-modo').addEventListener('change',()=>montaFila(true));
+function montaFila(forcar){
+  const mat=$('#fc-mat').value, modo=$('#fc-modo').value, key=mat+'|'+modo;
+  if(!forcar&&key===fcFiltroKey&&fcAtual&&S.cards.includes(fcAtual)){pintaCard();return;}
+  fcFiltroKey=key;
+  let cs=S.cards.filter(c=>!mat||c.materia===mat);
+  if(modo==='due')cs=cs.filter(c=>c.revisao<=hoje());
+  cs.sort((a,b)=>a.caixa-b.caixa||a.revisao.localeCompare(b.revisao)||Math.random()-.5);
+  fcFila=cs; fcAtual=fcFila.shift()||null; fcVirado=false; pintaCard();
+}
+function pintaCard(){
+  const area=$('#fc-area');
+  if(!fcAtual){const modo=$('#fc-modo').value;
+    area.innerHTML='<div class="empty">'+(modo==='due'?'Nenhum card para revisar hoje nesta seleção. <br><button class="btn sm" id="fc-todos" style="margin-top:10px">Revisar todos mesmo assim</button>':'Nenhum card nesta matéria ainda. Gere cards com Claude ou crie um manualmente.')+'</div>';return;}
+  const c=fcAtual, rest=fcFila.length;
+  area.innerHTML='<div class="row" style="justify-content:space-between"><span class="tag'+(pesoDe(c.materia)>1?' esp':'')+'">'+esc(c.materia)+'</span><span class="muted small num">Caixa '+c.caixa+' · '+rest+' restante'+(rest===1?'':'s')+'</span></div>'+
+   '<div class="fc-wrap"><button class="fc'+(fcVirado?' flip':'')+'" id="fc" aria-label="Virar card"><div class="fc-face"><div class="q">'+esc(c.frente)+'</div><div class="hint">Toque ou pressione espaço para ver a resposta</div></div>'+
+   '<div class="fc-face fc-back"><div class="muted small">Resposta</div><div class="a">'+esc(c.verso)+'</div><div class="hint">Como foi? Avalie abaixo.</div></div></button></div>'+
+   '<div class="rate"><button class="btn" data-r="0" '+(fcVirado?'':'disabled')+'>Errei<small>volta hoje</small></button><button class="btn" data-r="1" '+(fcVirado?'':'disabled')+'>Difícil<small>amanhã</small></button><button class="btn primary" data-r="2" '+(fcVirado?'':'disabled')+'>Fácil<small>'+INTERVALOS[Math.min(4,c.caixa)]+' dias</small></button></div>'+
+   '<div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn ghost sm danger" id="fc-del">Excluir card</button></div>';
+}
+$('#fc-area').addEventListener('click',async e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.id==='fc'){fcVirado=!fcVirado;t.classList.toggle('flip',fcVirado);document.querySelectorAll('.rate .btn').forEach(b=>b.disabled=!fcVirado);return;}
+  if(t.id==='fc-todos'){$('#fc-modo').value='all';montaFila(true);return;}
+  if(t.id==='fc-del'){if(await confirmar('Excluir card','Este card será removido de todas as revisões.')){S.cards=S.cards.filter(c=>c!==fcAtual);salvar();fcAtual=fcFila.shift()||null;fcVirado=false;renderFlash();}return;}
+  if(t.dataset.r!=null)avalia(+t.dataset.r);
+});
+document.addEventListener('keydown',e=>{if(!$('#v-flashcards').classList.contains('on')||!fcAtual)return;if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+  if(e.key===' '){e.preventDefault();const b=$('#fc');if(b)b.click();}
+  if(fcVirado&&['1','2','3'].includes(e.key))avalia(+e.key-1);});
+function avalia(r){
+  const c=fcAtual;if(!c)return; const t=hoje();
+  if(r===0){c.caixa=1;c.revisao=t;fcFila.push(c);}
+  else if(r===1){c.caixa=Math.max(1,c.caixa);c.revisao=addDias(t,1);}
+  else{const n=Math.min(5,c.caixa+1);c.revisao=addDias(t,INTERVALOS[Math.min(4,c.caixa)]);c.caixa=n;}
+  salvar(); fcAtual=fcFila.shift()||null; fcVirado=false;
+  const cx=[1,2,3,4,5].map(n=>S.cards.filter(x=>x.caixa===n).length);
+  $('#boxes').innerHTML=cx.map((n,i)=>'<div><b class="num">'+n+'</b><span>Caixa '+(i+1)+'<br>'+(i?INTERVALOS[i]+' d':'hoje')+'</span></div>').join('');
+  pintaCard();
+}
+$('#f-card').addEventListener('submit',e=>{e.preventDefault();const f=$('#c-f').value.trim(),v=$('#c-v').value.trim();if(!f||!v)return;
+  S.cards.push({id:uid(),materia:$('#c-mat').value,frente:f,verso:v,caixa:1,revisao:hoje(),origem:'manual'});salvar();$('#c-f').value='';$('#c-v').value='';toast('Card salvo.');renderFlash();});
+$('#g-edital').onclick=()=>{
+  let n=0; const t=hoje();
+  materias().forEach(m=>{const fr='Quais assuntos de '+m.nome+' o edital cobra?';
+    if(S.cards.some(c=>c.frente===fr))return;
+    S.cards.push({id:uid(),materia:m.nome,frente:fr,verso:m.topicos.map((x,i)=>(i+1)+'. '+x).join('\n'),caixa:1,revisao:t,origem:'edital'});n++;});
+  salvar();toast(n?n+' cards de revisão do edital criados.':'Os cards do edital já existem.');renderFlash();
+};
+$('#g-go').onclick=async()=>{
+  const mat=$('#g-mat').value, m=materiaPorNome(mat), top=$('#g-top').value, n=+$('#g-n').value, st=$('#g-status');
+  st.innerHTML='<span class="spin"></span> Gerando '+n+' flashcards de '+esc(mat)+'…'; $('#g-go').disabled=true;
+  const prompt='Você é professor de cursinho preparatório para concursos públicos no Brasil.\n'+
+   'Crie '+n+' flashcards para o cargo de '+S.plano.cargo+(S.plano.orgao?' da '+S.plano.orgao:'')+(S.plano.banca?' (banca '+S.plano.banca+')':'')+'.\n'+
+   'Matéria: '+mat+'.\n'+(top?'Tópico: '+top+'.\n':'Tópicos do edital: '+(m?m.topicos.join('; '):'')+'.\n')+
+   'Regras: português do Brasil; frente com uma pergunta objetiva e curta; verso com a resposta direta em até 3 linhas, citando o dispositivo legal (lei e artigo) quando houver; só fatos corretos e vigentes, sem inventar números de artigos; foco no que costuma cair em prova; sem repetir cards.\n'+
+   'Responda apenas com JSON: {"cards":[{"frente":"...","verso":"..."}]}';
+  try{
+    const r=await pedirJSON(prompt); const arr=(r&&Array.isArray(r.cards)?r.cards:Array.isArray(r)?r:[]).filter(c=>c&&c.frente&&c.verso);
+    if(!arr.length)throw {message:'resposta vazia'};
+    const t=hoje(); arr.slice(0,20).forEach(c=>S.cards.push({id:uid(),materia:mat,frente:String(c.frente).slice(0,400),verso:String(c.verso).slice(0,1200),caixa:1,revisao:t,origem:'claude'}));
+    if(S.cards.length>900)S.cards=S.cards.slice(-900);
+    salvar(); st.textContent=arr.length+' flashcards criados em '+mat+'. Eles já estão na fila de hoje.';
+    $('#fc-mat').value=mat;$('#fc-modo').value='due';renderFlash();montaFila(true);
+  }catch(e){st.textContent=msgErroIA(e);}
+  $('#g-go').disabled=!SAMPLE;
+};
+
+/* ============ Quiz ============ */
+let QZ=null; // {lista,i,escolhas:[],confirmadas:[],modo}
+const todasQuestoes=()=>BANCO.concat(EXTRA,S.questoesGeradas);
+const TIPOS={base:'Banco do app',padrao:'Padrão da prova CMC 2021 (Selecon)',ufmt:'Padrão da prova CMC 2011 (UFMT)',aprof:'Aprofundamento',claude:'Geradas por Claude'};
+const tipoDe=q=>q.origem==='ufmt'?'ufmt':q.origem==='padrao'?'padrao':q.origem==='aprof'?'aprof':q.origem==='claude'?'claude':'base';
+function renderQuiz(){ if(QZ&&!QZ.fim)pintaQuestao(); else if(QZ&&QZ.fim)pintaResultado(); else pintaSetup(); }
+function pintaSetup(){
+  const qs=todasQuestoes(); const mats=[...new Set(qs.map(q=>q.materia))];
+  const cont=n=>qs.filter(q=>!n||q.materia===n).length;
+  const hist=S.historico.slice(-6).reverse();
+  $('#quiz-root').innerHTML='<div class="grid g2"><div class="card"><div class="card-h"><h3>Montar quiz</h3><span class="muted small num">'+qs.length+' questões disponíveis</span></div>'+
+   '<div class="form-grid"><div class="field" style="grid-column:1/-1"><label for="qz-mat">Matéria</label><select id="qz-mat"><option value="">Todas ('+qs.length+')</option>'+mats.map(n=>'<option value="'+esc(n)+'">'+esc(n)+' ('+cont(n)+')</option>').join('')+'</select></div>'+
+   '<div class="field" style="grid-column:1/-1"><label for="qz-tipo">Tipo de questão</label><select id="qz-tipo"><option value="">Todos os tipos</option>'+Object.entries(TIPOS).map(([k,v])=>'<option value="'+k+'">'+v+' ('+qs.filter(q=>tipoDe(q)===k).length+')</option>').join('')+'</select></div>'+
+   '<div class="field"><label for="qz-n">Questões</label><select id="qz-n"><option>5</option><option selected>10</option><option>20</option><option value="999">Todas</option></select></div>'+
+   '<div class="field"><label for="qz-modo">Modo</label><select id="qz-modo"><option value="treino">Treino: gabarito a cada questão</option><option value="simulado">Simulado: gabarito no final</option></select></div>'+
+   '<div class="field"><label for="qz-ord">Prioridade</label><select id="qz-ord"><option value="erros">Primeiro as que errei e as inéditas</option><option value="aleatoria">Aleatória</option></select></div></div>'+
+   '<div class="row" style="margin-top:14px"><button class="btn primary" id="qz-go">Começar</button></div>'+
+   '<p class="muted small" style="margin:12px 0 0"><b>Padrão da prova CMC 2021</b>: questões inéditas que seguem os temas e formatos da prova de Técnico Legislativo aplicada pela Selecon em 2021, como interpretação de texto, lógica com proposições, planilhas e nuvem. <b>Padrão da prova CMC 2011 (UFMT)</b>: questões inéditas no formato da UFMT, banca do concurso de 2011, com 4 alternativas e itens de verdadeiro ou falso. <b>Aprofundamento</b>: questões mais difíceis de letra de lei e doutrina.</p></div>'+
+   '<div class="grid" style="align-content:start"><div class="card"><div class="card-h"><h3>Gerar questões inéditas</h3><span class="tag">'+(SAMPLE?'Claude':'Claude indisponível')+'</span></div>'+
+   '<div class="field"><label for="qg-mat">Matéria</label><select id="qg-mat"></select></div>'+
+   '<div class="field" style="margin-top:8px"><label for="qg-top">Tópico</label><select id="qg-top"></select></div>'+
+   '<div class="row" style="margin-top:10px"><div class="field" style="width:100px"><label for="qg-n">Quantidade</label><select id="qg-n"><option>3</option><option selected>5</option><option>8</option></select></div>'+
+   '<div class="field" style="width:130px"><label for="qg-dif">Dificuldade</label><select id="qg-dif"><option>média</option><option>difícil</option><option>fácil</option></select></div>'+
+   '<button class="btn primary" id="qg-go" style="margin-top:20px" '+(SAMPLE?'':'disabled')+'>Gerar</button></div>'+
+   '<p class="muted small" id="qg-st" aria-live="polite" style="margin:10px 0 0">Questões novas entram no banco com gabarito comentado.</p></div>'+
+   '<div class="card"><div class="card-h"><h3>Provas anteriores (originais)</h3><span class="muted small">Abrem fora do app</span></div><ul class="list">'+
+   '<li><span class="grow"><a href="https://www.camaracuiaba.mt.gov.br/arqs/M-TECNICO-LEGISLATIVO.pdf" target="_blank" rel="noopener">Câmara de Cuiabá 2021: Técnico Legislativo (Selecon)</a><br><span class="muted small">Caderno de questões publicado pela Câmara. Prova aplicada em 29/08/2021.</span></span></li>'+
+   '<li><span class="grow"><a href="https://www.qconcursos.com/concursos/camara-municipal-de-cuiaba-mt" target="_blank" rel="noopener">Concursos da Câmara de Cuiabá no Qconcursos</a><br><span class="muted small">Questões de 2021 por disciplina, com gabarito.</span></span></li>'+
+   '<li><span class="grow"><a href="https://www.pciconcursos.com.br/provas/download/tecnico-legislativo-camara-de-cuiaba-mt-ufmt-2011" target="_blank" rel="noopener">Câmara de Cuiabá 2011: Técnico Legislativo (UFMT)</a><br><span class="muted small">Caderno e gabarito do concurso anterior, de outra banca. Prova aplicada em 27/11/2011. A legislação local mudou desde então.</span></span></li>'+
+   '<li><span class="grow"><a href="https://www.pciconcursos.com.br/provas/camara-de-cuiaba-mt" target="_blank" rel="noopener">Todas as provas da Câmara de Cuiabá (PCI Concursos)</a><br><span class="muted small">Técnico Legislativo 2011 e 2021 e Taquígrafo 2011.</span></span></li>'+
+   '<li><span class="grow"><a href="https://conhecimento.fgv.br/sites/default/files/concursos/al-mt_2013_tecnico_a_legislativo_nivel_medioprova_tipo_03.pdf" target="_blank" rel="noopener">Assembleia Legislativa de MT 2013: Técnico Legislativo (FGV)</a><br><span class="muted small">Outro órgão, com conteúdo regional e legislativo parecido.</span></span></li>'+
+   '<li><span class="grow"><a href="https://mapastatic.s3.amazonaws.com/676ea644a154b071000d5776/selecon-2024-camara-de-rio-brilhante-ms-tecnico-legislativo-prova.pdf" target="_blank" rel="noopener">Câmara de Rio Brilhante/MS 2024: Técnico Legislativo (Selecon)</a><br><span class="muted small">Outra prova recente da banca para o mesmo cargo.</span></span></li>'+
+   '<li><span class="grow"><a href="https://www.selecon.org.br" target="_blank" rel="noopener">Site da Selecon</a><br><span class="muted small">Gabaritos e padrões de resposta de concursos anteriores.</span></span></li></ul>'+
+   '<p class="muted small" style="margin:8px 0 0">As questões originais não foram copiadas para o app porque têm direitos autorais. Faça-as pelo caderno e use o banco do app para fixar os mesmos temas.</p></div>'+
+   '<div class="card"><h3 style="margin-bottom:8px">Últimos quizzes</h3><ul class="list">'+(hist.length?hist.map(h=>'<li><span class="grow">'+esc(h.materia||'Todas as matérias')+'<br><span class="muted small num">'+h.data.split('-').reverse().slice(0,2).join('/')+' · '+h.acertos+'/'+h.total+'</span></span><span class="tag '+(h.pct>=60?'good':h.pct>=40?'':'bad')+' num">'+h.pct+'%</span></li>').join(''):'<li class="muted">Nenhum quiz feito ainda.</li>')+'</ul></div></div></div>';
+  opcoesMaterias($('#qg-mat'));
+  const pt=()=>{const m=materiaPorNome($('#qg-mat').value);$('#qg-top').innerHTML='<option value="">Toda a matéria</option>'+(m?m.topicos.map(x=>'<option>'+esc(x.length>90?x.slice(0,88)+'…':x)+'</option>').join(''):'');};
+  pt(); $('#qg-mat').onchange=pt;
+  $('#qz-go').onclick=iniciaQuiz; $('#qg-go').onclick=geraQuestoes;
+}
+function embaralha(q){
+  const ord=[0,1,2,3].sort(()=>Math.random()-.5);
+  return Object.assign({},q,{alternativas:ord.map(i=>q.alternativas[i]),porAlternativa:Array.isArray(q.porAlternativa)&&q.porAlternativa.length===4?ord.map(i=>q.porAlternativa[i]):q.porAlternativa,correta:ord.indexOf(q.correta)});
+}
+function iniciaQuiz(){
+  const mat=$('#qz-mat').value, n=+$('#qz-n').value, modo=$('#qz-modo').value, ord=$('#qz-ord').value, tipo=$('#qz-tipo').value;
+  let qs=todasQuestoes().filter(q=>(!mat||q.materia===mat)&&(!tipo||tipoDe(q)===tipo));
+  qs=qs.map(q=>({q,r:Math.random()}));
+  if(ord==='erros'){const p=q=>{const r=S.respostas[q.id];if(!r)return 1;if(r.erros>r.acertos)return 0;return 2;};qs.sort((a,b)=>p(a.q)-p(b.q)||a.r-b.r);} else qs.sort((a,b)=>a.r-b.r);
+  qs=qs.slice(0,n).map(x=>embaralha(x.q));
+  if(!qs.length){toast('Não há questões com esse filtro. Troque a matéria ou o tipo, ou gere questões com Claude.');return;}
+  QZ={lista:qs,i:0,escolhas:qs.map(()=>null),confirmadas:qs.map(()=>false),modo,materia:mat};
+  pintaQuestao();
+}
+function pintaQuestao(){
+  const q=QZ.lista[QZ.i], esc_=QZ.escolhas[QZ.i], conf=QZ.confirmadas[QZ.i], mostra=conf&&QZ.modo==='treino';
+  const pct=Math.round(QZ.i/QZ.lista.length*100);
+  $('#quiz-root').innerHTML='<div class="card" style="max-width:860px"><div class="qprog"><i style="width:'+pct+'%"></i></div>'+
+   '<div class="q-meta num"><span>Questão '+(QZ.i+1)+' de '+QZ.lista.length+'</span><span class="tag'+(pesoDe(q.materia)>1?' esp':'')+'">'+esc(q.materia)+'</span><span>'+esc(areaDe(q.materia))+' · '+String(pesoDe(q.materia)).replace('.',',')+' ponto'+(pesoDe(q.materia)>1?'s':'')+'</span>'+(tipoDe(q)!=='base'?'<span class="tag">'+TIPOS[tipoDe(q)]+'</span>':'')+'</div>'+
+   '<div class="q-text">'+esc(q.enunciado)+'</div>'+
+   '<div class="alts" role="radiogroup" aria-label="Alternativas">'+q.alternativas.map((a,k)=>{let cl='alt';if(mostra){if(k===q.correta)cl+=' ok';else if(k===esc_)cl+=' no';}else if(k===esc_)cl+=' sel';
+     return '<button class="'+cl+'" role="radio" aria-checked="'+(k===esc_)+'" data-k="'+k+'" '+(conf?'disabled':'')+'><span class="l">('+LETRAS[k]+')</span><span>'+esc(a)+'</span></button>';}).join('')+'</div>'+
+   (mostra?gabaritoHtml(q,esc_):'')+
+   '<div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn ghost" id="qz-sair">Sair do quiz</button><div class="row">'+
+   (QZ.i>0&&QZ.modo==='simulado'?'<button class="btn" id="qz-ant">Anterior</button>':'')+
+   (!conf?'<button class="btn primary" id="qz-conf" '+(esc_==null?'disabled':'')+'>'+(QZ.modo==='treino'?'Confirmar resposta':'Responder e avançar')+'</button>':'<button class="btn primary" id="qz-prox">'+(QZ.i+1<QZ.lista.length?'Próxima questão':'Ver resultado')+'</button>')+
+   '</div></div></div>';
+  const r=$('#quiz-root');
+  r.querySelectorAll('.alt').forEach(b=>b.onclick=()=>{QZ.escolhas[QZ.i]=+b.dataset.k;pintaQuestao();});
+  $('#qz-sair').onclick=async()=>{if(await confirmar('Sair do quiz','As respostas deste quiz não entram no histórico.')){QZ=null;pintaSetup();}};
+  if($('#qz-ant'))$('#qz-ant').onclick=()=>{QZ.i--;QZ.confirmadas[QZ.i]=false;pintaQuestao();};
+  if($('#qz-conf'))$('#qz-conf').onclick=()=>{QZ.confirmadas[QZ.i]=true;if(QZ.modo==='simulado'){avancar();}else pintaQuestao();};
+  if($('#qz-prox'))$('#qz-prox').onclick=avancar;
+}
+function gabaritoHtml(q,escolha){
+  const ok=escolha===q.correta;
+  return '<div class="gab"><h3>'+(escolha==null?'Gabarito':ok?'<span class="pill-ok">Você acertou.</span>':'<span class="pill-bad">Resposta incorreta.</span>')+' Gabarito: letra '+LETRAS[q.correta]+'</h3>'+
+   '<p>'+esc(q.comentario)+'</p>'+(Array.isArray(q.porAlternativa)&&q.porAlternativa.length===4?'<ul>'+q.porAlternativa.map((t,k)=>'<li><b>('+LETRAS[k]+')</b> '+esc(t)+'</li>').join('')+'</ul>':'')+'</div>';
+}
+function avancar(){ if(QZ.i+1<QZ.lista.length){QZ.i++;pintaQuestao();window.scrollTo({top:0});} else finaliza(); }
+function finaliza(){
+  let ac=0; QZ.lista.forEach((q,k)=>{const okk=QZ.escolhas[k]===q.correta; if(okk)ac++;
+    const r=S.respostas[q.id]||{acertos:0,erros:0}; if(okk)r.acertos++; else r.erros++; r.ultima=hoje(); S.respostas[q.id]=r;});
+  const pct=Math.round(ac/QZ.lista.length*100);
+  S.historico.push({data:hoje(),total:QZ.lista.length,acertos:ac,pct,materia:QZ.materia});
+  if(S.historico.length>60)S.historico=S.historico.slice(-60);
+  salvar(); QZ.fim=true; QZ.ac=ac; QZ.pct=pct; pintaResultado();
+}
+function pintaResultado(){
+  const tp=QZ.lista.reduce((a,q)=>a+pesoDe(q.materia),0), pp=QZ.lista.reduce((a,q,k)=>a+(QZ.escolhas[k]===q.correta?pesoDe(q.materia):0),0);
+  const pond=Math.round(pp/tp*100);
+  $('#quiz-root').innerHTML='<div class="grid g2"><div class="card"><div class="card-h"><h3>Resultado</h3><span class="tag '+(pond>=40?'good':'bad')+'">'+(pond>=40?'Acima do mínimo de 40%':'Abaixo do mínimo de 40%')+'</span></div>'+
+   '<div class="row" style="gap:28px"><div><div class="score num">'+QZ.ac+'/'+QZ.lista.length+'</div><div class="muted small">acertos ('+QZ.pct+'%)</div></div>'+
+   '<div><div class="score num" style="color:var(--accent)">'+pond+'%</div><div class="muted small">pontuação ponderada pelos pesos da prova</div></div></div>'+
+   '<p class="muted small">Na prova, cada questão de Conhecimentos Específicos vale 1,75 ponto e as demais valem 1,00. O candidato precisa de no mínimo 40 dos 100 pontos, sem zerar nenhuma área.</p>'+
+   '<div class="row" style="margin-top:10px"><button class="btn primary" id="qz-novo">Novo quiz</button><button class="btn" id="qz-refaz">Refazer as que errei</button></div></div>'+
+   '<div class="card"><h3 style="margin-bottom:8px">Revisão</h3><ul class="list">'+QZ.lista.map((q,k)=>{const okk=QZ.escolhas[k]===q.correta;
+     return '<li><span class="tag '+(okk?'good':'bad')+'">'+(okk?'Certo':'Errado')+'</span><span class="grow"><button class="btn ghost sm" data-ver="'+k+'" style="text-align:left;padding:2px 4px">Questão '+(k+1)+': '+esc(q.materia)+'</button></span><span class="muted small num">Sua: '+(QZ.escolhas[k]==null?'–':LETRAS[QZ.escolhas[k]])+' · Gab.: '+LETRAS[q.correta]+'</span></li>';}).join('')+'</ul></div></div>'+
+   '<div id="qz-det" style="margin-top:16px"></div>';
+  $('#qz-novo').onclick=()=>{QZ=null;pintaSetup();};
+  $('#qz-refaz').onclick=()=>{const er=QZ.lista.filter((q,k)=>QZ.escolhas[k]!==q.correta);if(!er.length){toast('Você acertou todas.');return;}
+    QZ={lista:er,i:0,escolhas:er.map(()=>null),confirmadas:er.map(()=>false),modo:'treino',materia:'Revisão de erros'};pintaQuestao();};
+  $('#quiz-root').querySelectorAll('[data-ver]').forEach(b=>b.onclick=()=>{const k=+b.dataset.ver,q=QZ.lista[k];
+    $('#qz-det').innerHTML='<div class="card" style="max-width:860px"><div class="q-meta"><span>Questão '+(k+1)+'</span><span class="tag">'+esc(q.materia)+'</span></div><div class="q-text">'+esc(q.enunciado)+'</div><div class="alts">'+q.alternativas.map((a,j)=>'<div class="alt'+(j===q.correta?' ok':j===QZ.escolhas[k]?' no':'')+'"><span class="l">('+LETRAS[j]+')</span><span>'+esc(a)+'</span></div>').join('')+'</div>'+gabaritoHtml(q,QZ.escolhas[k])+'</div>';
+    $('#qz-det').scrollIntoView({behavior:'smooth',block:'start'});});
+}
+async function geraQuestoes(){
+  const mat=$('#qg-mat').value, m=materiaPorNome(mat), top=$('#qg-top').value, n=+$('#qg-n').value, dif=$('#qg-dif').value, st=$('#qg-st');
+  st.innerHTML='<span class="spin"></span> Gerando '+n+' questões de '+esc(mat)+'…'; $('#qg-go').disabled=true;
+  const prompt='Você é elaborador de provas de concursos públicos e conhece o estilo da banca Selecon (Instituto Nacional de Seleções e Concursos).\n'+
+   'Crie '+n+' questões inéditas de múltipla escolha para o cargo de '+S.plano.cargo+(S.plano.orgao?' da '+S.plano.orgao:'')+', nível de dificuldade '+dif+'.\n'+
+   'Matéria: '+mat+'.\n'+(top?'Tópico: '+top+'.\n':'Tópicos do edital: '+(m?m.topicos.join('; '):'')+'.\n')+
+   'Estilo Selecon: exatamente 4 alternativas (A a D) e uma única correta; enunciado objetivo, muitas vezes com uma situação do dia a dia de uma Câmara Municipal ou da Administração Pública; cobrança da letra da lei e de sua aplicação; distratores plausíveis, com troca de prazos, quóruns ou termos. Distribua a letra correta entre A, B, C e D.\n'+
+   'Use apenas informação correta e vigente; cite a lei e o artigo no comentário quando houver; não invente dispositivos. Em temas de legislação municipal de Cuiabá, só use fatos de que tenha certeza.\n'+
+   'Responda apenas com JSON: {"questoes":[{"enunciado":"...","alternativas":["...","...","...","..."],"correta":0,"comentario":"explicação do gabarito","porAlternativa":["por que (A) está certa ou errada","(B)","(C)","(D)"]}]} em que "correta" é o índice de 0 a 3.';
+  try{
+    const r=await pedirJSON(prompt); const arr=(r&&Array.isArray(r.questoes)?r.questoes:Array.isArray(r)?r:[]);
+    const val=arr.filter(q=>q&&q.enunciado&&Array.isArray(q.alternativas)&&q.alternativas.length===4&&Number.isInteger(+q.correta)&&+q.correta>=0&&+q.correta<=3)
+      .map(q=>({id:'g'+uid(),materia:mat,enunciado:String(q.enunciado).slice(0,2500),alternativas:q.alternativas.map(a=>String(a).replace(/^\(?[A-Da-d]\)\s*/,'').slice(0,600)),correta:+q.correta,
+        comentario:String(q.comentario||'').slice(0,1800),porAlternativa:Array.isArray(q.porAlternativa)&&q.porAlternativa.length===4?q.porAlternativa.map(x=>String(x).replace(/^\(?[A-Da-d]\)\s*[:\-–]?\s*/,'').slice(0,500)):null,origem:'claude',criada:hoje()}));
+    if(!val.length)throw {message:'nenhuma questão válida na resposta'};
+    S.questoesGeradas=S.questoesGeradas.concat(val); if(S.questoesGeradas.length>220)S.questoesGeradas=S.questoesGeradas.slice(-220);
+    salvar(); toast(val.length+' questões novas adicionadas.');
+    QZ={lista:val,i:0,escolhas:val.map(()=>null),confirmadas:val.map(()=>false),modo:'treino',materia:mat};pintaQuestao();
+  }catch(e){st.textContent=msgErroIA(e);$('#qg-go').disabled=!SAMPLE;}
+}
+
+/* ============ Backup ============ */
+const emFrame=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
+if(!emFrame)$('#bk-baixar').hidden=false;
+const textoBackup=()=>JSON.stringify(Object.assign({},S,{app:'aprova-legislativo',exportado:new Date().toISOString()}));
+$('#bk-copiar').onclick=async()=>{try{await navigator.clipboard.writeText(textoBackup());toast('Backup copiado. Cole no app do outro aparelho, em "Restaurar backup".');}
+  catch(e){$('#bk-rest').hidden=false;$('#bk-txt').value=textoBackup();$('#bk-txt').select();toast('Não consegui copiar sozinho. O backup está no campo abaixo: selecione e copie.');}};
+$('#bk-baixar').onclick=()=>{try{const b=new Blob([textoBackup()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='aprova-legislativo-backup-'+hoje()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}catch(e){toast('Não foi possível baixar. Use "Copiar backup".');}};
+$('#bk-abrir').onclick=()=>{$('#bk-rest').hidden=!$('#bk-rest').hidden;};
+$('#bk-file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{$('#bk-txt').value=await f.text();toast('Arquivo carregado. Toque em "Restaurar agora".');}catch(er){toast('Não consegui ler o arquivo.');}e.target.value='';});
+$('#bk-ok').onclick=async()=>{
+  let d=null;try{d=JSON.parse($('#bk-txt').value);}catch(e){toast('O texto colado não é um backup válido.');return;}
+  if(!d||typeof d!=='object'||!Array.isArray(d.sessoes)){toast('O texto colado não é um backup do Aprova Legislativo.');return;}
+  if(!(await confirmar('Restaurar backup','Os dados deste aparelho serão substituídos pelos do backup ('+d.sessoes.length+' sessões, '+(d.cards||[]).length+' cards).')))return;
+  delete d.app;delete d.exportado;S=saneia(d);S.atualizado=Date.now();salvar();$('#bk-txt').value='';$('#bk-rest').hidden=true;atualizaSub();rota();pintaCfg();pintaPomo();toast('Backup restaurado.');
+};
+
+/* ============ Discursiva ============ */
+let dCrono={fim:0,iv:null};
+function linhasEstimadas(t){return String(t||'').split(/\n/).reduce((a,p)=>a+(p.trim()?Math.ceil(p.trim().length/70):0),0);}
+function renderDisc(){
+  $('#temas').innerHTML=TEMAS.map(t=>'<div class="card tema"><h3>'+esc(t.titulo)+'</h3><p class="muted small" style="margin:0">'+esc(t.porque)+'</p>'+
+    '<div class="small"><b>Aborde:</b><ul>'+t.pontos.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+    '<div class="links"><b class="small">Leituras</b>'+t.leituras.map(k=>'<a href="'+L[k].u+'" target="_blank" rel="noopener">'+esc(L[k].t)+'</a>').join('')+'</div>'+
+    '<button class="btn sm" data-treino="'+t.id+'" style="align-self:flex-start;margin-top:auto">Treinar este tema</button></div>').join('');
+  const sel=$('#d-tema'), v=sel.value||TEMAS[0].id;
+  sel.innerHTML=TEMAS.map(t=>'<option value="'+t.id+'"'+(t.id===v?' selected':'')+'>'+esc(t.titulo)+'</option>').join('');
+  pintaProposta(); contaDisc(); listaRedacoes();
+  $('#d-corrigir').disabled=!SAMPLE; if(!SAMPLE)$('#d-st').textContent='A correção com Claude não está disponível nesta visualização. Use a lista "Aborde" de cada tema como autocorreção.';
+}
+function temaAtual(){return TEMAS.find(t=>t.id===$('#d-tema').value)||TEMAS[0];}
+function pintaProposta(){const t=temaAtual();$('#d-prop').innerHTML='<b>Proposta de treino:</b> '+esc(t.proposta)+' <span class="muted">(de 20 a 30 linhas)</span>';}
+function contaDisc(){const tx=$('#d-texto').value, n=linhasEstimadas(tx);
+  const tg=$('#d-linhas'); tg.textContent='≈ '+n+' linha'+(n===1?'':'s');
+  tg.className='tag '+(n===0?'':n<20?'bad':n<=30?'good':'warn');
+  $('#d-chars').textContent=tx.length+' caracteres';}
+$('#d-tema').addEventListener('change',()=>{pintaProposta();$('#d-res').innerHTML='';});
+$('#d-texto').addEventListener('input',contaDisc);
+$('#temas').addEventListener('click',e=>{const b=e.target.closest('[data-treino]');if(!b)return;$('#d-tema').value=b.dataset.treino;pintaProposta();$('#d-res').innerHTML='';$('#d-texto').focus();$('#d-texto').scrollIntoView({behavior:'smooth',block:'center'});});
+$('#d-crono-go').onclick=()=>{
+  if(dCrono.iv){clearInterval(dCrono.iv);dCrono.iv=null;$('#d-crono').textContent='60:00';$('#d-crono-go').textContent='Iniciar cronômetro de 60 min';return;}
+  dCrono.fim=Date.now()+60*60000; $('#d-crono-go').textContent='Parar cronômetro';
+  const tick=()=>{const r=Math.max(0,dCrono.fim-Date.now()),m=Math.floor(r/60000),s=Math.floor(r%60000/1000);$('#d-crono').textContent=z(m)+':'+z(s);
+    if(r<=0){clearInterval(dCrono.iv);dCrono.iv=null;$('#d-crono-go').textContent='Iniciar cronômetro de 60 min';toast('Tempo da discursiva encerrado.');}};
+  tick(); dCrono.iv=setInterval(tick,1000);
+};
+function salvaRedacao(extra){
+  const tx=$('#d-texto').value.trim(); if(!tx){toast('Escreva o texto antes de salvar.');return null;}
+  const t=temaAtual(); const r=Object.assign({id:uid(),tema:t.id,titulo:t.titulo,data:hoje(),texto:tx.slice(0,6000),linhas:linhasEstimadas(tx)},extra||{});
+  S.redacoes.unshift(r); if(S.redacoes.length>25)S.redacoes=S.redacoes.slice(0,25); salvar(); listaRedacoes(); return r;
+}
+$('#d-salvar').onclick=()=>{if(salvaRedacao())toast('Texto salvo.');};
+function listaRedacoes(){
+  const el=$('#d-lista');
+  el.innerHTML=S.redacoes.length?S.redacoes.map(r=>'<li><span class="grow">'+esc(r.titulo)+'<br><span class="muted small num">'+r.data.split('-').reverse().slice(0,2).join('/')+' · ≈ '+r.linhas+' linhas'+(r.nota!=null?' · nota estimada '+r.nota:'')+'</span></span><button class="btn ghost sm" data-abrir="'+r.id+'">Abrir</button><button class="btn ghost sm danger" data-apagar="'+r.id+'" aria-label="Excluir texto">Excluir</button></li>').join(''):'<li class="muted">Nenhum texto salvo ainda.</li>';
+}
+$('#d-lista').addEventListener('click',async e=>{const a=e.target.dataset;
+  if(a.abrir){const r=S.redacoes.find(x=>x.id===a.abrir);if(!r)return;$('#d-tema').value=r.tema;pintaProposta();$('#d-texto').value=r.texto;contaDisc();$('#d-res').innerHTML=r.correcao?resultadoHtml(r.correcao):'';$('#d-texto').scrollIntoView({behavior:'smooth',block:'center'});}
+  if(a.apagar&&await confirmar('Excluir texto','O texto e a correção salvos serão removidos.')){S.redacoes=S.redacoes.filter(x=>x.id!==a.apagar);salvar();listaRedacoes();}});
+function resultadoHtml(c){
+  const lst=a=>Array.isArray(a)&&a.length?'<ul>'+a.map(x=>'<li>'+esc(typeof x==='string'?x:(x.trecho?'"'+x.trecho+'" → '+(x.correcao||''):JSON.stringify(x)))+'</li>').join('')+'</ul>':'<p class="muted">Nada a apontar.</p>';
+  const tot=(+c.conteudo||0)+(+c.formal||0);
+  return '<div class="gab"><div class="res-nota num"><div><span class="muted small">Conteúdo</span><b>'+(+c.conteudo||0)+'<span class="muted small">/80</span></b></div><div><span class="muted small">Correção formal</span><b>'+(+c.formal||0)+'<span class="muted small">/20</span></b></div><div><span class="muted small">Total estimado</span><b style="color:'+(tot>=40?'var(--good)':'var(--bad)')+'">'+tot+'</b></div></div>'+
+   (c.zera?'<p class="pill-bad">Atenção: '+esc(c.zera)+'</p>':'')+'<p>'+esc(c.comentarioGeral||'')+'</p>'+
+   '<h3 style="font-size:.95rem;margin-top:10px">Pontos fortes</h3>'+lst(c.pontosFortes)+
+   '<h3 style="font-size:.95rem;margin-top:10px">O que melhorar no conteúdo</h3>'+lst(c.melhorias)+
+   '<h3 style="font-size:.95rem;margin-top:10px">Correções de língua</h3>'+lst(c.errosFormais)+
+   (c.introducaoSugerida?'<h3 style="font-size:.95rem;margin-top:10px">Sugestão de introdução</h3><p>'+esc(c.introducaoSugerida)+'</p>':'')+
+   '<p class="muted small">Nota estimada por IA com base nos critérios do edital. A banca pode avaliar de forma diferente.</p></div>';
+}
+$('#d-corrigir').onclick=async()=>{
+  const tx=$('#d-texto').value.trim(), t=temaAtual(), st=$('#d-st');
+  if(!tx){toast('Escreva o texto antes de pedir a correção.');return;}
+  st.innerHTML='<span class="spin"></span> Claude está corrigindo com os critérios da Selecon…'; $('#d-corrigir').disabled=true;
+  const n=linhasEstimadas(tx);
+  const prompt='Você é corretor de provas discursivas da banca Selecon, em concurso para Técnico Legislativo de Câmara Municipal (nível médio).\n'+
+   'Critérios do edital: CONTEÚDO (0 a 80): análise das ideias fundamentais da resposta, fidelidade ao tema proposto, consistência, relevância da fundamentação e progressão temática. CORREÇÃO FORMAL (0 a 20): ortografia, acentuação, propriedade vocabular, morfossintaxe, pontuação e elementos de coesão.\n'+
+   'Regras: nota zero se fugir ao tema ou à tipologia, se tiver menos de 20 linhas, se for cópia; a nota é reduzida proporcionalmente em abordagem tangencial, parcial ou diluída em divagações. O texto deve ter de 20 a 30 linhas. Estimativa de linhas deste texto: '+n+' (cerca de 70 caracteres por linha manuscrita).\n'+
+   'Proposta: '+t.proposta+'\nAspectos esperados: '+t.pontos.join('; ')+'.\n\n'+
+   'Corrija com rigor de banca, em português do Brasil, apontando trechos concretos. Não invente regras jurídicas; se o candidato errar um fato jurídico, aponte o erro e a forma correta.\n'+
+   'Responda apenas com JSON: {"conteudo":0,"formal":0,"zera":"motivo, se houver condição que zere, senão string vazia","comentarioGeral":"2 a 3 frases","pontosFortes":["..."],"melhorias":["..."],"errosFormais":[{"trecho":"...","correcao":"..."}],"introducaoSugerida":"reescrita da introdução em até 4 linhas"}\n\nTEXTO DO CANDIDATO:\n'+tx.slice(0,6000);
+  try{
+    const c=await pedirJSON(prompt);
+    if(!c||typeof c!=='object')throw {message:'resposta inválida'};
+    c.conteudo=Math.max(0,Math.min(80,Math.round(+c.conteudo||0))); c.formal=Math.max(0,Math.min(20,Math.round(+c.formal||0)));
+    if(c.zera){c.conteudo=0;c.formal=0;}
+    $('#d-res').innerHTML=resultadoHtml(c);
+    salvaRedacao({nota:c.conteudo+c.formal,correcao:c}); st.textContent='Correção concluída e texto salvo em "Meus textos".';
+  }catch(e){st.textContent=msgErroIA(e);}
+  $('#d-corrigir').disabled=!SAMPLE;
+};
+
+/* ============ Inicialização ============ */
+function chipProva(){const d=Math.round((parseIso(DATA_PROVA)-parseIso(hoje()))/864e5);
+  $('#chip-prova').innerHTML='<span class="dot"></span>'+(d>0?'Prova em '+d+' dia'+(d===1?'':'s')+' (13/12)':d===0?'Prova hoje':'Prova realizada em 13/12');}
+function aplica(estado){S=saneia(estado);atualizaSub();rota();}
+(function boot(){
+  const loc=lerLocal(); if(loc)S=saneia(loc);
+  atualizaSub(); chipProva(); marcarSalvar(); rota(); restauraP();
+  if(window.claude&&typeof window.claude.use==='function'){
+    window.claude.use('sample').then(s=>{SAMPLE=s||null;rota();}).catch(()=>{});
+    Promise.all([window.claude.use('db'),window.claude.use('user')]).then(async([db,user])=>{
+      if(!db||!user)return; const id=await user.id(); if(!id)return;
+      DB=db; USERID=id; docRef=db.doc('data/users/'+id+'/estado');
+      const timer=setTimeout(()=>{$('#chip-save').textContent='Conta indisponível; salvando neste navegador';},10000);
+      try{
+        const snap=await docRef.get(); clearTimeout(timer);
+        if(snap.exists){const remoto=saneia(snap.data());
+          if((remoto.atualizado||0)>=(S.atualizado||0)){S=remoto;gravarLocal();atualizaSub();rota();pintaCfg();pintaPomo();}else{enviar();}}
+        else if(S.atualizado){enviar();}
+        marcarSalvar();
+      }catch(e){clearTimeout(timer);docRef=null;marcarSalvar('erro');}
+    }).catch(()=>{});
+  }
+})();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol==='https:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
